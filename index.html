@@ -27,13 +27,11 @@
 
     <header class="max-w-7xl mx-auto text-center mb-10">
         <h1 class="text-4xl md:text-6xl font-extrabold bg-gradient-to-r from-emerald-400 to-teal-200 bg-clip-text text-transparent italic tracking-tighter uppercase">BATALHA DE SPECS</h1>
-        <p class="text-emerald-500/60 text-[10px] font-bold tracking-[0.4em] uppercase mt-2">Duelo de Titãs em Tempo Real</p>
+        <p class="text-emerald-500/60 text-[10px] font-bold tracking-[0.4em] uppercase mt-2 text-center">Compare até 4 aparelhos em tempo real</p>
     </header>
 
     <main class="max-w-7xl mx-auto">
-        
         <div id="setupArea">
-            <!-- 4 COLUNAS FIXAS -->
             <div id="searchGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
                 <script>
                     for(let i=0; i<4; i++) {
@@ -43,9 +41,9 @@
                                 <div class="w-full relative">
                                     <input type="text" placeholder="Nome do celular..." 
                                            onchange="buscarNoSlot(${i}, this.value)"
-                                           class="w-full bg-white/5 border border-white/10 rounded-full px-5 py-3 text-[11px] outline-none focus:border-emerald-500 transition-all">
+                                           class="w-full bg-white/5 border border-white/10 rounded-full px-5 py-3 text-[11px] outline-none focus:border-emerald-500 transition-all uppercase">
                                 </div>
-                                <div id="result-${i}" class="w-full space-y-1 max-h-40 overflow-y-auto"></div>
+                                <div id="result-${i}" class="w-full space-y-1 max-h-40 overflow-y-auto mt-2"></div>
                             </div>
                         `);
                     }
@@ -75,63 +73,58 @@
     </main>
 
     <script>
-        // CHAVE E HOST DA API
         const API_KEY = '0adddb24fbmsh2289164deba91c5p1ff721jsn0d25d66220ff'.trim();
         const HOST = 'mobile-phone-specs-database.p.rapidapi.com';
         const slotsData = [null, null, null, null];
 
         async function buscarNoSlot(index, query) {
-            if(!query || query.length < 2) return;
+            if(!query) return;
             const resDiv = document.getElementById(`result-${index}`);
             resDiv.innerHTML = '<div class="flex justify-center py-4"><div class="loading-spin"></div></div>';
 
             try {
-                // TENTANDO O ENDPOINT /gsm/search-query/ que é o mais comum dessa API
-                const response = await fetch(`https://${HOST}/gsm/search-query/${query}`, {
+                // URL CORRIGIDA PARA O SEU PLANO (v2)
+                const url = `https://${HOST}/v2/mobile-phone-specs-database/search-query?query=${encodeURIComponent(query)}`;
+                
+                const response = await fetch(url, {
                     method: 'GET',
-                    headers: { 
-                        'X-RapidAPI-Key': API_KEY, 
-                        'X-RapidAPI-Host': HOST 
-                    }
+                    headers: { 'X-RapidAPI-Key': API_KEY, 'X-RapidAPI-Host': HOST }
                 });
                 
-                if (!response.ok) {
-                    throw new Error(`Erro ${response.status}`);
-                }
+                if (!response.ok) throw new Error(`Erro ${response.status}`);
 
                 const data = await response.json();
                 resDiv.innerHTML = '';
 
                 if(!data || data.length === 0) {
-                    resDiv.innerHTML = '<p class="text-[9px] text-center opacity-40 italic">Nenhum resultado encontrado.</p>';
+                    resDiv.innerHTML = '<p class="text-[9px] text-center opacity-40">Nenhum resultado.</p>';
                     return;
                 }
 
                 data.slice(0, 5).forEach(item => {
                     const btn = document.createElement('button');
                     btn.className = "w-full text-left p-3 rounded-2xl bg-white/5 text-[10px] font-semibold hover:bg-emerald-500 hover:text-black transition-all border border-white/5 mb-1 truncate uppercase";
-                    btn.innerText = item.device_name || item.title;
-                    btn.onclick = () => selecionarParaSlot(index, item.slug, btn.innerText);
+                    btn.innerText = item.device_name;
+                    // Usando custom_id que é o padrão da sua API
+                    btn.onclick = () => selecionarParaSlot(index, item.custom_id, item.device_name);
                     resDiv.appendChild(btn);
                 });
             } catch (err) {
-                resDiv.innerHTML = `<p class="text-[9px] text-red-400 text-center font-bold italic">${err.message}. Verifique a Vercel!</p>`;
-                console.error("Erro na busca:", err);
+                resDiv.innerHTML = `<p class="text-[9px] text-red-400 text-center">${err.message}</p>`;
             }
         }
 
-        async function selecionarParaSlot(index, slug, name) {
+        async function selecionarParaSlot(index, customId, name) {
             const slotEl = document.getElementById(`slot-${index}`);
             slotEl.style.opacity = "0.5";
 
             try {
-                // BUSCANDO AS SPECS PELO SLUG (NOME-DO-CELULAR)
-                const res = await fetch(`https://${HOST}/gsm/get-specifications-by-slug/${slug}`, {
+                // BUSCANDO PELO CUSTOM ID (CONFORME SEU PRINT)
+                const url = `https://${HOST}/v2/mobile-phone-specs-database/get-specifications-by-custom-id?custom_id=${customId}`;
+                
+                const res = await fetch(url, {
                     method: 'GET',
-                    headers: { 
-                        'X-RapidAPI-Key': API_KEY,
-                        'X-RapidAPI-Host': HOST
-                    }
+                    headers: { 'X-RapidAPI-Key': API_KEY, 'X-RapidAPI-Host': HOST }
                 });
                 const specs = await res.json();
                 slotsData[index] = specs;
@@ -139,7 +132,7 @@
                 slotEl.style.opacity = "1";
                 slotEl.classList.add('slot-confirmed');
                 slotEl.innerHTML = `
-                    <div class="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center mb-2 shadow-lg shadow-emerald-500/20">
+                    <div class="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center mb-2">
                         <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
                     </div>
                     <p class="text-[11px] font-bold text-center leading-tight uppercase italic">${name}</p>
@@ -149,8 +142,7 @@
                 const ativos = slotsData.filter(s => s !== null).length;
                 document.getElementById('battleBtn').disabled = ativos < 2;
             } catch(e) {
-                alert("Erro ao carregar detalhes do aparelho.");
-                console.error(e);
+                alert("Erro ao carregar detalhes.");
             }
         }
 
@@ -170,7 +162,7 @@
                     ${selecionados.map(p => `
                         <th class="p-6 text-center border-l border-white/5">
                             <span class="block text-emerald-400 text-[9px] font-bold uppercase mb-1">${p.phoneDetails?.brandValue || ''}</span>
-                            <span class="font-black text-sm uppercase leading-none">${p.phoneDetails?.modelValue || p.device_name}</span>
+                            <span class="font-black text-sm uppercase leading-none">${p.phoneDetails?.modelValue || 'Smartphone'}</span>
                         </th>
                     `).join('')}
                 </tr>
@@ -178,22 +170,22 @@
 
             const rows = [
                 { label: 'Lançamento', val: p => p.phoneDetails?.yearValue },
+                { label: 'Rede', val: p => p.gsmNetworkDetails?.networkSpeed },
                 { label: 'Processador (CPU)', val: p => p.gsmPlatformDetails?.platformCpu },
                 { label: 'Chipset', val: p => p.gsmPlatformDetails?.platformChipset },
                 { label: 'Memória e RAM', val: p => p.gsmMemoryDetails?.memoryInternal },
-                { label: 'Câmera Principal', val: p => p.gsmMainCameraDetails?.mainCameraQuad || p.gsmMainCameraDetails?.mainCameraTriple || p.gsmMainCameraDetails?.main_camera_single },
-                { label: 'Câmera de Selfie', val: p => p.gsmSelfieCameraDetails?.selfieCameraSingle },
+                { label: 'Câmera Principal', val: p => p.gsmMainCameraDetails?.mainCameraQuad || p.gsmMainCameraDetails?.mainCameraTriple },
+                { label: 'Câmera Frontal', val: p => p.gsmSelfieCameraDetails?.selfieCameraSingle },
                 { label: 'Bateria', val: p => p.gsmBatteryDetails?.batteryType },
-                { label: 'Tecnologia da Tela', val: p => p.gsmDisplayDetails?.displayType },
-                { label: 'Resolução da Tela', val: p => p.gsmDisplayDetails?.displayResolution },
-                { label: 'Sistema (OS)', val: p => p.gsmPlatformDetails?.platformOs },
+                { label: 'Tela', val: p => p.gsmDisplayDetails?.displayType },
+                { label: 'Resolução', val: p => p.gsmDisplayDetails?.displayResolution },
                 { label: 'Preço Estimado', val: p => p.gsmMiscDetails?.miscPrice }
             ];
 
             body.innerHTML = rows.map((row, i) => `
                 <tr class="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
                     <td class="p-5 text-emerald-500 font-bold text-[10px] uppercase bg-emerald-500/5">${row.label}</td>
-                    ${selecionados.map(p => `<td class="p-5 text-center border-l border-white/5 font-light text-white/80 text-[11px]">${row.val(p) || 'N/A'}</td>`).join('')}
+                    ${selecionados.map(p => `<td class="p-5 text-center border-l border-white/5 font-light text-[11px] text-white/80">${row.val(p) || 'N/A'}</td>`).join('')}
                 </tr>
             `).join('');
         }
