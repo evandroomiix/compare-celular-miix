@@ -27,7 +27,7 @@
 
     <header class="max-w-7xl mx-auto text-center mb-10">
         <h1 class="text-4xl md:text-6xl font-extrabold bg-gradient-to-r from-emerald-400 to-teal-200 bg-clip-text text-transparent italic tracking-tighter uppercase">BATALHA DE SPECS</h1>
-        <p class="text-emerald-500/60 text-[10px] font-bold tracking-[0.4em] uppercase mt-2">Compare até 4 aparelhos em tempo real</p>
+        <p class="text-emerald-500/60 text-[10px] font-bold tracking-[0.4em] uppercase mt-2">Duelo de Titãs em Tempo Real</p>
     </header>
 
     <main class="max-w-7xl mx-auto">
@@ -86,74 +86,74 @@
                     headers: { 'X-RapidAPI-Key': API_KEY, 'X-RapidAPI-Host': HOST }
                 });
                 
-                const responseData = await response.json();
+                const data = await response.json();
+                const results = data.data?.phones || data.phones || data.data || [];
+
                 resDiv.innerHTML = '';
-
-                // A Zyla costuma retornar os dados em data.phones ou data.data.phones
-                const results = responseData.data?.phones || responseData.phones || responseData.data || [];
-
                 if(results.length === 0) {
-                    resDiv.innerHTML = '<p class="text-[9px] text-center opacity-40 italic">Nada encontrado.</p>';
+                    resDiv.innerHTML = '<p class="text-[9px] text-center opacity-40">Nada encontrado.</p>';
                     return;
                 }
 
                 results.slice(0, 5).forEach(item => {
-                    // Tenta encontrar qualquer ID disponível no objeto
-                    const finalId = item.slug || item.phone_id || item.id;
-                    
-                    if (!finalId) return; // Pula se não tiver ID
-
+                    const slug = item.slug || item.phone_id || item.id;
                     const btn = document.createElement('button');
                     btn.className = "w-full text-left p-3 rounded-2xl bg-white/5 text-[10px] font-semibold hover:bg-emerald-500 hover:text-black transition-all border border-white/5 mb-1 truncate uppercase";
-                    btn.innerText = item.phone_name || item.device_name || "Ver modelo";
-                    btn.onclick = () => selecionarParaSlot(index, finalId, btn.innerText);
+                    btn.innerText = item.phone_name || item.device_name;
+                    btn.onclick = () => carregarDetalhesSeguro(index, slug, btn.innerText);
                     resDiv.appendChild(btn);
                 });
             } catch (err) {
-                resDiv.innerHTML = `<p class="text-[9px] text-red-400 text-center font-bold">Erro de Conexão.</p>`;
+                resDiv.innerHTML = `<p class="text-[9px] text-red-400 text-center font-bold">Erro de conexão.</p>`;
             }
         }
 
-        async function selecionarParaSlot(index, id, name) {
+        async function carregarDetalhesSeguro(index, id, name) {
             const slotEl = document.getElementById(`slot-${index}`);
             const resDiv = document.getElementById(`result-${index}`);
             resDiv.innerHTML = '<div class="flex justify-center py-4"><div class="loading-spin"></div></div>';
 
-            try {
-                const url = `https://${HOST}/2165/specifications?id=${id}`;
-                const res = await fetch(url, {
-                    method: 'GET',
-                    headers: { 'X-RapidAPI-Key': API_KEY, 'X-RapidAPI-Host': HOST }
-                });
-                
-                const responseData = await res.json();
-                const specs = responseData.data || responseData; 
-                
-                slotsData[index] = specs;
-                
+            // Tenta dois caminhos possíveis da Zyla
+            const caminhos = [`2165/specifications?id=${id}`, `2165/phone-specifications?id=${id}`];
+            let sucesso = false;
+
+            for (let path of caminhos) {
+                try {
+                    const res = await fetch(`https://${HOST}/${path}`, {
+                        method: 'GET',
+                        headers: { 'X-RapidAPI-Key': API_KEY, 'X-RapidAPI-Host': HOST }
+                    });
+                    
+                    if (res.ok) {
+                        const responseData = await res.json();
+                        slotsData[index] = responseData.data || responseData;
+                        sucesso = true;
+                        break;
+                    }
+                } catch (e) {}
+            }
+
+            if (sucesso) {
                 slotEl.classList.add('slot-confirmed');
                 slotEl.innerHTML = `
-                    <div class="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center mb-2">
+                    <div class="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center mb-2 shadow-lg shadow-emerald-500/20">
                         <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
                     </div>
                     <p class="text-[11px] font-bold text-center leading-tight uppercase italic">${name}</p>
                     <button onclick="location.reload()" class="mt-4 text-[9px] font-bold text-white/30 hover:text-red-400 uppercase tracking-widest">Trocar</button>
                 `;
-                
-                const ativos = slotsData.filter(s => s !== null).length;
-                document.getElementById('battleBtn').disabled = ativos < 2;
-            } catch(e) {
-                resDiv.innerHTML = `<p class="text-[9px] text-red-400 text-center italic">Erro ao carregar specs.</p>`;
+                document.getElementById('battleBtn').disabled = slotsData.filter(s => s !== null).length < 2;
+            } else {
+                resDiv.innerHTML = `<p class="text-[9px] text-red-400 text-center italic">Erro 404: Specs não encontradas.</p>`;
             }
         }
 
-        // Função auxiliar para pegar dados dentro da estrutura complexa da API
-        function getNestedSpec(device, categoryTitle, specKey) {
+        function getVal(device, categoryTitle, keyName) {
             if (!device || !device.specifications) return "N/A";
-            const category = device.specifications.find(s => s.title.toLowerCase().includes(categoryTitle.toLowerCase()));
-            if (!category) return "N/A";
-            const spec = category.specs.find(s => s.key.toLowerCase().includes(specKey.toLowerCase()));
-            return spec ? spec.val[0] : "N/A";
+            const cat = device.specifications.find(s => s.title.toLowerCase().includes(categoryTitle.toLowerCase()));
+            if (!cat) return "N/A";
+            const item = cat.specs.find(s => s.key.toLowerCase().includes(keyName.toLowerCase()));
+            return item ? item.val[0] : "N/A";
         }
 
         function iniciarBatalha() {
@@ -169,33 +169,27 @@
             head.innerHTML = `
                 <tr>
                     <th class="p-6 text-emerald-400 text-[10px] font-black uppercase tracking-[0.2em] italic">Atributo</th>
-                    ${selecionados.map(p => `
-                        <th class="p-6 text-center border-l border-white/5">
-                            <span class="block text-emerald-400 text-[9px] font-bold uppercase mb-1">${p.brand || ''}</span>
-                            <span class="font-black text-sm uppercase leading-none">${p.phone_name || 'Smartphone'}</span>
-                        </th>
-                    `).join('')}
+                    ${selecionados.map(p => `<th class="p-6 text-center border-l border-white/5 font-black text-sm uppercase">${p.phone_name}</th>`).join('')}
                 </tr>
             `;
 
             const rows = [
-                { label: 'Processador (CPU)', val: p => getNestedSpec(p, 'Platform', 'CPU') },
-                { label: 'Chipset', val: p => getNestedSpec(p, 'Platform', 'Chipset') },
-                { label: 'Sistema (OS)', val: p => getNestedSpec(p, 'Platform', 'OS') },
-                { label: 'Memória Interna', val: p => getNestedSpec(p, 'Memory', 'Internal') },
-                { label: 'Câmera Principal', val: p => getNestedSpec(p, 'Main Camera', 'Single') || getNestedSpec(p, 'Main Camera', 'Triple') || getNestedSpec(p, 'Main Camera', 'Quad') },
-                { label: 'Câmera de Selfie', val: p => getNestedSpec(p, 'Selfie camera', 'Single') },
-                { label: 'Bateria', val: p => getNestedSpec(p, 'Battery', 'Type') },
-                { label: 'Carregamento', val: p => getNestedSpec(p, 'Battery', 'Charging') },
-                { label: 'Tela', val: p => getNestedSpec(p, 'Display', 'Type') },
-                { label: 'Resolução', val: p => getNestedSpec(p, 'Display', 'Resolution') },
+                { label: 'Processador (CPU)', val: p => getVal(p, 'Platform', 'CPU') },
+                { label: 'Chipset', val: p => getVal(p, 'Platform', 'Chipset') },
+                { label: 'Memória Interna', val: p => getVal(p, 'Memory', 'Internal') },
+                { label: 'Câmera Principal', val: p => getVal(p, 'Main Camera', 'Single') || getVal(p, 'Main Camera', 'Triple') },
+                { label: 'Câmera Selfie', val: p => getVal(p, 'Selfie camera', 'Single') },
+                { label: 'Bateria', val: p => getVal(p, 'Battery', 'Type') },
+                { label: 'Tela', val: p => getVal(p, 'Display', 'Type') },
+                { label: 'Resolução', val: p => getVal(p, 'Display', 'Resolution') },
+                { label: 'Sistema (OS)', val: p => getVal(p, 'Platform', 'OS') },
                 { label: 'Lançamento', val: p => p.release_date || 'N/A' }
             ];
 
             body.innerHTML = rows.map((row, i) => `
-                <tr class="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
+                <tr class="border-b border-white/5 hover:bg-white/[0.02]">
                     <td class="p-5 text-emerald-500 font-bold text-[10px] uppercase bg-emerald-500/5">${row.label}</td>
-                    ${selecionados.map(p => `<td class="p-5 text-center border-l border-white/5 font-light text-[11px] text-white/80">${row.val(p)}</td>`).join('')}
+                    ${selecionados.map(p => `<td class="p-5 text-center border-l border-white/5 font-light text-[11px]">${row.val(p)}</td>`).join('')}
                 </tr>
             `).join('');
         }
