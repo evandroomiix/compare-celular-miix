@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aurora Spec - Comparador de Celulares</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #010c0a; color: white; }
+        .aurora-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1; overflow: hidden; pointer-events: none;
+        }
+        .glow-1 { position: absolute; top: -10%; left: -10%; width: 60%; height: 60%; background: rgba(16, 185, 129, 0.1); filter: blur(120px); border-radius: 50%; }
+        .glow-2 { position: absolute; bottom: -10%; right: -10%; width: 50%; height: 50%; background: rgba(20, 184, 166, 0.1); filter: blur(120px); border-radius: 50%; }
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); }
+    </style>
+</head>
+<body>
+
+    <div class="aurora-bg">
+        <div class="glow-1"></div>
+        <div class="glow-2"></div>
+    </div>
+
+    <nav class="sticky top-0 z-50 glass border-b border-white/10 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold bg-gradient-to-r from-emerald-400 to-teal-200 bg-clip-text text-transparent italic">AURORA SPEC</h1>
+            <span class="text-xs text-emerald-500 font-mono hidden md:block">COMPARAÇÃO PROFISSIONAL</span>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 py-10">
+        
+        <!-- CARDS DOS CELULARES -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+            <!-- CELULAR 1 -->
+            <div class="glass rounded-[2.5rem] p-8 transition-all hover:border-emerald-500/50 group text-center md:text-left">
+                <span class="text-emerald-400 text-xs font-bold tracking-widest uppercase">Samsung</span>
+                <h2 class="text-3xl font-bold mb-2">Galaxy S24 Ultra</h2>
+                <p class="text-emerald-300 font-semibold text-xl mb-6">R$ 7.200 <small class="text-white/30 text-xs">(médio)</small></p>
+                <div class="flex justify-center mb-4">
+                    <img src="https://images.samsung.com/is/image/samsung/p6pim/br/2401/gallery/br-galaxy-s24-s928-sm-s928bztqzto-539358253?$650_519_PNG$" 
+                         alt="S24 Ultra" class="h-64 object-contain transition-transform group-hover:-translate-y-4 duration-500">
+                </div>
+            </div>
+
+            <!-- CELULAR 2 -->
+            <div class="glass rounded-[2.5rem] p-8 transition-all hover:border-emerald-500/50 group text-center md:text-left">
+                <span class="text-emerald-400 text-xs font-bold tracking-widest uppercase">Apple</span>
+                <h2 class="text-3xl font-bold mb-2">iPhone 15 Pro Max</h2>
+                <p class="text-emerald-300 font-semibold text-xl mb-6">R$ 8.900 <small class="text-white/30 text-xs">(médio)</small></p>
+                <div class="flex justify-center mb-4">
+                    <img src="https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-15-pro-finish-select-202309-6-7inch-naturaltitanium?wid=5120&hei=2880&fmt=p-jpg&qlt=80&.v=1692845702708" 
+                         alt="iPhone 15 Pro" class="h-64 object-contain transition-transform group-hover:-translate-y-4 duration-500">
+                </div>
+            </div>
+        </div>
+
+        <!-- TABELA DE COMPARAÇÃO -->
+        <div class="glass rounded-[3rem] overflow-hidden shadow-2xl">
+            <div class="p-8 md:p-12">
+                <h3 class="text-2xl font-bold mb-10 flex items-center gap-4">
+                    <span class="w-2 h-8 bg-emerald-500 rounded-full"></span> Especificações
+                </h3>
+
+                <!-- LINHAS DA TABELA -->
+                <div class="space-y-0 border-t border-white/10">
+                    <div class="grid grid-cols-3 py-6 border-b border-white/5 items-center">
+                        <div class="text-emerald-400 text-sm font-bold uppercase">Tela</div>
+                        <div class="text-center text-sm md:text-base px-2">6.8" Dynamic AMOLED 120Hz</div>
+                        <div class="text-center text-sm md:text-base px-2 border-l border-white/10">6.7" Super Retina XDR</div>
+                    </div>
+
+                    <div class="grid grid-cols-3 py-6 border-b border-white/5 items-center bg-white/5">
+                        <div class="text-emerald-400 text-sm font-bold uppercase">Câmera</div>
+                        <div class="text-center text-sm md:text-base px-2">200MP + 50MP + 12MP</div>
+                        <div class="text-center text-sm md:text-base px-2 border-l border-white/10">48MP + 12MP + 12MP</div>
+                    </div>
+
+                    <div class="grid grid-cols-3 py-6 border-b border-white/5 items-center">
+                        <div class="text-emerald-400 text-sm font-bold uppercase">Processador</div>
+                        <div class="text-center text-sm md:text-base px-2">Snapdragon 8 Gen 3</div>
+                        <div class="text-center text-sm md:text-base px-2 border-l border-white/10">Apple A17 Pro</div>
+                    </div>
+
+                    <div class="grid grid-cols-3 py-6 border-b border-white/5 items-center bg-white/5">
+                        <div class="text-emerald-400 text-sm font-bold uppercase">Bateria</div>
+                        <div class="text-center text-sm md:text-base px-2">5.000 mAh</div>
+                        <div class="text-center text-sm md:text-base px-2 border-l border-white/10">4.441 mAh</div>
+                    </div>
+                </div>
+
+                <!-- BARRAS DE PERFORMANCE -->
+                <div class="mt-16 space-y-8">
+                    <div>
+                        <p class="text-center text-xs font-bold text-emerald-500 uppercase tracking-widest mb-4">Poder de Processamento</p>
+                        <div class="space-y-4">
+                            <div class="w-full bg-white/5 h-3 rounded-full overflow-hidden">
+                                <div class="bg-emerald-500 h-full" style="width: 97%"></div>
+                            </div>
+                            <div class="w-full bg-white/5 h-3 rounded-full overflow-hidden">
+                                <div class="bg-teal-400 h-full" style="width: 98%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="py-20 text-center text-white/20 text-xs">
+        © 2024 Aurora Spec • Comparador Moderno de Smartphones
+    </footer>
+
+</body>
+</html>
