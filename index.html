@@ -27,18 +27,19 @@
 
     <header class="max-w-7xl mx-auto text-center mb-10">
         <h1 class="text-4xl md:text-6xl font-extrabold bg-gradient-to-r from-emerald-400 to-teal-200 bg-clip-text text-transparent italic tracking-tighter uppercase">BATALHA DE SPECS</h1>
-        <p class="text-emerald-500/60 text-[10px] font-bold tracking-[0.4em] uppercase mt-2 text-center">Compare até 4 aparelhos em tempo real</p>
+        <p class="text-emerald-500/60 text-[10px] font-bold tracking-[0.4em] uppercase mt-2 text-center">Comparador Inteligente - Tecnologia Zyla Labs</p>
     </header>
 
     <main class="max-w-7xl mx-auto">
         <div id="setupArea">
+            <!-- 4 COLUNAS FIXAS -->
             <div id="searchGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
                 <script>
                     for(let i=0; i<4; i++) {
                         document.write(`
                             <div class="slot glass p-6 rounded-[2.5rem] flex flex-col items-center gap-4 border-white/5 transition-all" id="slot-${i}">
                                 <span class="text-[9px] font-black text-emerald-500/40 uppercase tracking-widest uppercase">Aparelho 0${i+1}</span>
-                                <input type="text" placeholder="Nome do celular..." 
+                                <input type="text" placeholder="Pesquisar celular..." 
                                        onchange="buscarNoSlot(${i}, this.value)"
                                        class="w-full bg-white/5 border border-white/10 rounded-full px-5 py-3 text-[11px] outline-none focus:border-emerald-500 transition-all uppercase">
                                 <div id="result-${i}" class="w-full space-y-1 max-h-40 overflow-y-auto mt-2"></div>
@@ -71,8 +72,9 @@
     </main>
 
     <script>
+        // CONFIGURAÇÕES DA NOVA API (ZYLA LABS)
         const API_KEY = '0adddb24fbmsh2289164deba91c5p1ff721jsn0d25d66220ff'.trim();
-        const HOST = 'mobile-phone-specs-database.p.rapidapi.com';
+        const HOST = 'phone-specs-explorer-api.p.rapidapi.com';
         const slotsData = [null, null, null, null];
 
         async function buscarNoSlot(index, query) {
@@ -81,58 +83,69 @@
             resDiv.innerHTML = '<div class="flex justify-center py-4"><div class="loading-spin"></div></div>';
 
             try {
-                // ENDPOINT CORRIGIDO BASEADO NA DOCUMENTAÇÃO V2: get-search-requests
-                const url = `https://${HOST}/v2/mobile-phone-specs-database/get-search-requests?query=${encodeURIComponent(query)}`;
+                // ENDPOINT DE BUSCA DA NOVA API
+                const url = `https://${HOST}/2165/search?q=${encodeURIComponent(query)}`;
                 
                 const response = await fetch(url, {
                     method: 'GET',
-                    headers: { 'X-RapidAPI-Key': API_KEY, 'X-RapidAPI-Host': HOST }
+                    headers: { 
+                        'X-RapidAPI-Key': API_KEY, 
+                        'X-RapidAPI-Host': HOST,
+                        'Content-Type': 'application/json'
+                    }
                 });
                 
-                if (!response.ok) throw new Error(`Status ${response.status}`);
-
                 const data = await response.json();
                 resDiv.innerHTML = '';
 
-                // Nesta API, os resultados costumam vir em um array direto
-                if(!data || data.length === 0) {
-                    resDiv.innerHTML = '<p class="text-[9px] text-center opacity-40">Nada encontrado.</p>';
+                // A Zyla Labs geralmente retorna os dados dentro de uma propriedade 'data' ou direto no array
+                const results = data.data || data;
+
+                if(!results || results.length === 0) {
+                    resDiv.innerHTML = '<p class="text-[9px] text-center opacity-40">Nenhum aparelho encontrado.</p>';
                     return;
                 }
 
-                data.slice(0, 5).forEach(item => {
+                results.slice(0, 5).forEach(item => {
                     const btn = document.createElement('button');
                     btn.className = "w-full text-left p-3 rounded-2xl bg-white/5 text-[10px] font-semibold hover:bg-emerald-500 hover:text-black transition-all border border-white/5 mb-1 truncate uppercase";
-                    btn.innerText = item.device_name || item.title || "Ver modelo";
-                    // Algumas versões usam custom_id, outras usam id. Vamos garantir ambos.
-                    const idParaUsar = item.custom_id || item.id;
-                    btn.onclick = () => selecionarParaSlot(index, idParaUsar, btn.innerText);
+                    btn.innerText = item.phone_name || item.device_name || "Ver modelo";
+                    
+                    // Pega o ID único do aparelho
+                    const id = item.id || item.slug || item.phone_id;
+                    btn.onclick = () => selecionarParaSlot(index, id, btn.innerText);
                     resDiv.appendChild(btn);
                 });
             } catch (err) {
-                resDiv.innerHTML = `<p class="text-[9px] text-red-400 text-center font-bold">Erro ${err.message}. Verifique a Vercel!</p>`;
+                resDiv.innerHTML = `<p class="text-[9px] text-red-400 text-center font-bold">Erro de conexão. Verifique o plano!</p>`;
             }
         }
 
-        async function selecionarParaSlot(index, customId, name) {
+        async function selecionarParaSlot(index, phoneId, name) {
             const slotEl = document.getElementById(`slot-${index}`);
             slotEl.style.opacity = "0.5";
 
             try {
-                // ENDPOINT DE DETALHES QUE VOCÊ MOSTROU NO PRINT
-                const url = `https://${HOST}/v2/mobile-phone-specs-database/get-specifications-by-custom-id?custom_id=${customId}`;
+                // ENDPOINT DE ESPECIFICAÇÕES DA NOVA API
+                const url = `https://${HOST}/2165/phone-specifications?id=${phoneId}`;
                 
                 const res = await fetch(url, {
                     method: 'GET',
-                    headers: { 'X-RapidAPI-Key': API_KEY, 'X-RapidAPI-Host': HOST }
+                    headers: { 
+                        'X-RapidAPI-Key': API_KEY, 
+                        'X-RapidAPI-Host': HOST,
+                        'Content-Type': 'application/json'
+                    }
                 });
-                const specs = await res.json();
+                const responseData = await res.json();
+                const specs = responseData.data || responseData; // Zyla costuma encapsular em .data
+                
                 slotsData[index] = specs;
                 
                 slotEl.style.opacity = "1";
                 slotEl.classList.add('slot-confirmed');
                 slotEl.innerHTML = `
-                    <div class="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center mb-2">
+                    <div class="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center mb-2 shadow-lg shadow-emerald-500/20">
                         <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
                     </div>
                     <p class="text-[11px] font-bold text-center leading-tight uppercase italic">${name}</p>
@@ -142,7 +155,7 @@
                 const ativos = slotsData.filter(s => s !== null).length;
                 document.getElementById('battleBtn').disabled = ativos < 2;
             } catch(e) {
-                alert("Erro ao carregar specs do aparelho.");
+                alert("Erro ao carregar detalhes do aparelho.");
             }
         }
 
@@ -161,33 +174,32 @@
                     <th class="p-6 text-emerald-400 text-[10px] font-black uppercase tracking-[0.2em] italic">Atributo</th>
                     ${selecionados.map(p => `
                         <th class="p-6 text-center border-l border-white/5">
-                            <span class="block text-emerald-400 text-[9px] font-bold uppercase mb-1">${p.phoneDetails?.brandValue || ''}</span>
-                            <span class="font-black text-sm uppercase leading-none">${p.phoneDetails?.modelValue || 'Smartphone'}</span>
+                            <span class="block text-emerald-400 text-[9px] font-bold uppercase mb-1">${p.brand || ''}</span>
+                            <span class="font-black text-sm uppercase leading-none">${p.phone_name || 'Smartphone'}</span>
                         </th>
                     `).join('')}
                 </tr>
             `;
 
-            // MAPEAMENTO EXATO COM AS CHAVES DO SEU JSON ENVIADO
+            // MAPEAMENTO DE DADOS (Zyla Labs costuma ter esses nomes de chaves)
             const rows = [
-                { label: 'Lançamento', val: p => p.phoneDetails?.yearValue },
-                { label: 'Rede', val: p => p.gsmNetworkDetails?.networkSpeed },
-                { label: 'Processador (CPU)', val: p => p.gsmPlatformDetails?.platformCpu },
-                { label: 'Chipset', val: p => p.gsmPlatformDetails?.platformChipset },
-                { label: 'Memória e RAM', val: p => p.gsmMemoryDetails?.memoryInternal },
-                { label: 'Câmera Principal', val: p => p.gsmMainCameraDetails?.mainCameraQuad || p.gsmMainCameraDetails?.mainCameraTriple },
-                { label: 'Câmera de Selfie', val: p => p.gsmSelfieCameraDetails?.selfieCameraSingle },
-                { label: 'Bateria', val: p => p.gsmBatteryDetails?.batteryType },
-                { label: 'Tela', val: p => p.gsmDisplayDetails?.displayType },
-                { label: 'Dimensões', val: p => p.gsmBodyDetails?.bodyDimensions },
-                { label: 'Sistema (OS)', val: p => p.gsmPlatformDetails?.platformOs },
-                { label: 'Preço Estimado', val: p => p.gsmMiscDetails?.miscPrice }
+                { label: 'Sistema (OS)', val: p => p.os || p.platform_os },
+                { label: 'Processador (CPU)', val: p => p.cpu || p.platform_cpu },
+                { label: 'Chipset', val: p => p.chipset || p.platform_chipset },
+                { label: 'Memória RAM', val: p => p.ram || p.memory_ram },
+                { label: 'Armazenamento', val: p => p.storage || p.memory_internal },
+                { label: 'Câmera Principal', val: p => p.camera_main || p.main_camera_single },
+                { label: 'Câmera Selfie', val: p => p.camera_selfie || p.selfie_camera_single },
+                { label: 'Bateria', val: p => p.battery || p.battery_type },
+                { label: 'Tela', val: p => p.screen_size || p.display_size },
+                { label: 'Resolução', val: p => p.resolution || p.display_resolution },
+                { label: 'Dimensões', val: p => p.dimensions || p.body_dimensions }
             ];
 
             body.innerHTML = rows.map((row, i) => `
                 <tr class="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
                     <td class="p-5 text-emerald-500 font-bold text-[10px] uppercase bg-emerald-500/5">${row.label}</td>
-                    ${selecionados.map(p => `<td class="p-5 text-center border-l border-white/5 font-light text-[11px] text-white/80">${row.val(p) || 'N/A'}</td>`).join('')}
+                    ${selecionados.map(p => `<td class="p-5 text-center border-l border-white/5 font-light text-[11px] text-white/80">${row.val(p) || 'Consultar Fabricante'}</td>`).join('')}
                 </tr>
             `).join('');
         }
