@@ -81,16 +81,17 @@
     </main>
 
     <script>
-        const API_KEY = '0adddb24fbmsh2289164deba91c5p1ff721jsn0d25d66220ff';
-        const HOST = 'mobile-phone-specs-database.p.rapidapi.com';
-        
-        // BANCO DE DADOS LOCAL (SEGURANÇA CASO A API FALHE)
-        const dbLocal = [
-            { brand: "SAMSUNG", name: "GALAXY S24 ULTRA", slug: "samsung_galaxy_s24_ultra", price: "R$ 6.800", cpu: "Snapdragon 8 Gen 3", ram: "12GB", storage: "256GB/512GB/1TB", cam: "200MP + 50MP + 12MP", bat: "5000 mAh", screen: "6.8\" Dynamic AMOLED 2X", sensor: "Impressão Digital, Acelerômetro, Giroscópio" },
-            { brand: "SAMSUNG", name: "GALAXY S23 FE", slug: "samsung_galaxy_s23_fe", price: "R$ 2.700", cpu: "Exynos 2200", ram: "8GB", storage: "128GB/256GB", cam: "50MP + 12MP + 8MP", bat: "4500 mAh", screen: "6.4\" AMOLED 120Hz", sensor: "Digital sob a tela, NFC" },
-            { brand: "SAMSUNG", name: "GALAXY S25 ULTRA", rumor: true, price: "Previsão R$ 8.500", cpu: "Snapdragon 8 Gen 4", ram: "16GB", storage: "512GB/1TB", cam: "200MP (OIS)", bat: "5500 mAh", screen: "6.9\" LTPO 144Hz", sensor: "IA Integrada, Satélite" },
-            { brand: "APPLE", name: "IPHONE 16 PRO MAX", slug: "apple_iphone_16_pro_max", price: "R$ 9.400", cpu: "Apple A18 Pro", ram: "8GB", storage: "256GB a 1TB", cam: "48MP + 48MP + 12MP", bat: "4676 mAh", screen: "6.9\" Super Retina XDR", sensor: "FaceID, LiDAR, Botão de Ação" },
-            { brand: "APPLE", name: "IPHONE 15", slug: "apple_iphone_15", price: "R$ 4.800", cpu: "Apple A16 Bionic", ram: "6GB", storage: "128GB/256GB", cam: "48MP + 12MP", bat: "3349 mAh", screen: "6.1\" OLED", sensor: "Dynamic Island, USB-C" }
+        // BANCO DE DADOS LOCAL COM OS DADOS DO APIFY
+        // Agora o site é 100% offline, rápido e não depende de APIs externas!
+        const phoneDatabase = [
+            // Cole aqui os dados do seu JSON do Apify
+            // O exemplo que você me deu já está abaixo:
+            {"maker_id":9,"phone_id":14379,"brand":"Samsung","name":"Samsung Galaxy A57","model_name":"Galaxy A57 5G","search_tokens":"5G Notch PHC","url":"https://www.gsmarena.com/samsung_galaxy_a57_5g-14379.php","image_url":"https://fdn2.gsmarena.com/vv/bigpic/samsung-galaxy-a56-.jpg","_source":"GSM Arena API + Detail Page","announced":"Not announced yet","os":"Android 16, up to 6 major Android upgrades, One UI 8","display_size":"6.7 inches, 110.2 cm2","display_res":"1080x2340 pixels","camera_pixels":"50","ram_size":"6/8","battery_size":"5000","modelname":"Samsung Galaxy A57","released_hl":"Not announced yet","os_hl":"Android 16, up to 6 major upgrades, One UI 8","storage_hl":"128GB/256GB storage, no card slot","displaysize_hl":"6.7\"","displayres_hl":"1080x2340 pixels","camerapixels_hl":"50","videopixels_hl":"2160p","ramsize_hl":"6/8","chipset_hl":"Exynos 1680","batsize_hl":"5000","battype_hl":"45W","comment":"Also known as Samsung Galaxy A57 5G Unofficial preliminary specifications","nettech":"GSM / HSPA / LTE / 5G","net2g":"GSM 850 / 900 / 1800 / 1900","net3g":"HSDPA 850 / 900 / 1700(AWS) / 1900 / 2100","net4g":"LTE","net5g":"SA/NSA/Sub6","speed":"HSPA, LTE, 5G","year":"Not announced yet","status":"Rumored","dimensions":"-","weight":"-","build":"Glass front (Gorilla Glass Victus+), aluminum frame, glass back (Gorilla Glass Victus+)","sim":"Nano-SIM + Nano-SIM + eSIM + eSIM (max 2 at a time)","bodyother":"IP67 dust/water resistant (up to 1m for 30 min)","displaytype":"Super AMOLED, 120Hz, HDR10+, 1200 nits (HBM), 1900 nits (peak)","displaysize":"6.7 inches, 110.2 cm2","displayresolution":"1080 x 2340 pixels, 19.5:9 ratio (~385 ppi density)","displayprotection":"Corning Gorilla Glass Victus+","chipset":"Exynos 1680","memoryslot":"No","internalmemory":"128GB 6GB RAM, 128GB 8GB RAM, 256GB 8GB RAM","memoryother":"UFS","cam1modules":"50 MP, f/1.8, (wide), 1/1.56\", 1.0µm, PDAF, OIS 13 MP, f/2.2, 123˚ (ultrawide), 1/3.0\", 1.12µm 5 MP (macro)","cam1features":"Best Face, LED flash, panorama, HDR","cam1video":"4K@30fps, 1080p@30/60fps, gyro-EIS","cam2modules":"12 MP, f/2.2, (wide), 1/3.2\", 1.12µm","cam2video":"4K@30fps, 1080p@30/60fps, 10-bit HDR","wlan":"Wi-Fi 802.11 a/b/g/n/ac/6, dual-band, Wi-Fi Direct","bluetooth":"5.4, A2DP, LE","gps":"GPS, GALILEO, GLONASS, BDS, QZSS","nfc":"Yes (market/region dependent)","radio":"No","usb":"USB Type-C 2.0, OTG","sensors":"Fingerprint (under display, optical), accelerometer, gyro, compass","featuresother":"Virtual Proximity Sensing","batdescription1":"5000 mAh","colors":"Black; other colors","models":"SM-A576B, SM-A576B/DS, SM-A576Q, SM-A576U1, SM-A576W, SM-A576Z, SM-A5760","sar_us":"0.85 W/kg (head) 1.20 W/kg (body)","sar_eu":"0.70 W/kg (head) 1.07 W/kg (body)","network_technology":"GSM / HSPA / LTE / 5G","network_2g_bands":"GSM 850 / 900 / 1800 / 1900","network_3g_bands":"HSDPA 850 / 900 / 1700(AWS) / 1900 / 2100","network_4g_bands":"LTE","network_5g_bands":"SA/NSA/Sub6","network_speed":"HSPA, LTE, 5G","launch_announced":"Not announced yet","launch_status":"Rumored","body_dimensions":"-","body_weight":"-","body_build":"Glass front (Gorilla Glass Victus+), aluminum frame, glass back (Gorilla Glass Victus+)","body_sim":"Nano-SIM + Nano-SIM + eSIM + eSIM (max 2 at a time)","display_type":"Super AMOLED, 120Hz, HDR10+, 1200 nits (HBM), 1900 nits (peak)","display_resolution":"1080 x 2340 pixels, 19.5:9 ratio (~385 ppi density)","display_protection":"Corning Gorilla Glass Victus+","platform_os":"Android 16, up to 6 major Android upgrades, One UI 8","platform_chipset":"Exynos 1680","memory_card_slot":"No","memory_internal":"128GB 6GB RAM, 128GB 8GB RAM, 256GB 8GB RAM","main_camera_triple":"50 MP, f/1.8, (wide), 1/1.56\", 1.0µm, PDAF, OIS 13 MP, f/2.2, 123˚ (ultrawide), 1/3.0\", 1.12µm 5 MP (macro)","main_camera_features":"Best Face, LED flash, panorama, HDR","main_camera_video":"4K@30fps, 1080p@30/60fps, gyro-EIS","selfie_camera_single":"12 MP, f/2.2, (wide), 1/3.2\", 1.12µm","selfie_camera_video":"4K@30fps, 1080p@30/60fps, 10-bit HDR","sound_loudspeaker":"Yes, with stereo speakers","sound_3_5mm_jack":"No","comms_wlan":"Wi-Fi 802.11 a/b/g/n/ac/6, dual-band, Wi-Fi Direct","comms_bluetooth":"5.4, A2DP, LE","comms_positioning":"GPS, GALILEO, GLONASS, BDS, QZSS","comms_nfc":"Yes (market/region dependent)","comms_radio":"No","comms_usb":"USB Type-C 2.0, OTG","features_sensors":"Fingerprint (under display, optical), accelerometer, gyro, compass","battery_type":"5000 mAh","battery_charging":"45W wired","misc_colors":"Black; other colors","misc_models":"SM-A576B, SM-A576B/DS, SM-A576Q, SM-A576U1, SM-A576W, SM-A576Z, SM-A5760","misc_sar":"0.85 W/kg (head) 1.20 W/kg (body)","misc_sar_eu":"0.70 W/kg (head) 1.07 W/kg (body)"},
+            {"maker_id":9,"phone_id":13603,"brand":"Samsung","name":"Galaxy A56","model_name":"Galaxy A56","search_tokens":"5G Notch PHC galaxya56","url":"https://www.gsmarena.com/samsung_galaxy_a56-13603.php","image_url":"https://fdn2.gsmarena.com/vv/bigpic/samsung-galaxy-a56-.jpg","_source":"GSM Arena API + Detail Page"},
+            {"maker_id":9,"phone_id":13497,"brand":"Samsung","name":"Samsung Galaxy A36","model_name":"Galaxy A36","search_tokens":"5G Notch PHC","url":"https://www.gsmarena.com/samsung_galaxy_a36-13497.php","image_url":"https://fdn2.gsmarena.com/vv/bigpic/samsung-galaxy-a36.jpg","_source":"GSM Arena API + Detail Page","announced":"Released 2025, March 10","os":"Android 15, up to 6 major Android upgrades, One UI 7","display_size":"6.7 inches, 110.2 cm2 (~86.5% screen-to-body ratio)","display_res":"1080x2340 pixels","camera_pixels":"50","ram_size":"6-12","battery_size":"5000","modelname":"Samsung Galaxy A36","released_hl":"Released 2025, March 10","body_hl":"195g, 7.4mm thickness","os_hl":"Android 15, up to 6 major upgrades, One UI 7","storage_hl":"128GB/256GB storage, no card slot","displaysize_hl":"6.7\"","displayres_hl":"1080x2340 pixels","camerapixels_hl":"50","videopixels_hl":"2160p","ramsize_hl":"6-12","chipset_hl":"Snapdragon 6 Gen 3","batsize_hl":"5000","battype_hl":"45W","nettech":"GSM / HSPA / LTE / 5G","net2g":"GSM 850 / 900 / 1800 / 1900","net3g":"HSDPA 850 / 900 / 1700(AWS) / 1900 / 2100","net4g":"1, 2, 3, 4, 5, 7, 8, 12, 17, 20, 25, 26, 28, 32, 38, 40, 41, 66 - International","net5g":"1, 3, 5, 7, 8, 20, 28, 38, 40, 41, 66, 77, 78 SA/NSA/Sub6 - International","speed":"HSPA, LTE, 5G","year":"2025, March 02","status":"Available. Released 2025, March 10","dimensions":"162.9 x 78.2 x 7.4 mm (6.41 x 3.08 x 0.29 in)","weight":"195 g (6.88 oz)","build":"Glass front (Gorilla Glass Victus+), plastic frame, glass back (Gorilla Glass Victus+)","sim":"· Nano-SIM + eSIM· Nano-SIM + Nano-SIM + eSIM + eSIM (max 2 at a time)","bodyother":"IP67 dust/water resistant (up to 1m for 30 min)","displaytype":"Super AMOLED, 120Hz, 1200 nits (HBM), 1900 nits (peak)","displaysize":"6.7 inches, 110.2 cm2 (~86.5% screen-to-body ratio)","displayresolution":"1080 x 2340 pixels, 19.5:9 ratio (~385 ppi density)","displayprotection":"Corning Gorilla Glass Victus+, Mohs level 5","chipset":"Qualcomm SM6475-AB Snapdragon 6 Gen 3 (4 nm)","cpu":"Octa-core (4x2.4 GHz Cortex-A78 & 4x1.8 GHz Cortex-A55)","gpu":"Adreno 710","memoryslot":"No","internalmemory":"128GB 6GB RAM, 128GB 8GB RAM, 256GB 6GB RAM, 256GB 8GB RAM, 256GB 12GB RAM","memoryother":"UFS 2.2","cam1modules":"50 MP, f/1.8, (wide), 1/1.96\", PDAF, OIS 8 MP, f/2.2, 123˚, (ultrawide), 1/4.0\", 1.12µm 5 MP (macro)","cam1features":"LED flash, panorama, HDR","cam1video":"4K@30fps, 1080p@30/60fps, gyro-EIS","cam2modules":"12 MP, f/2.2, (wide)","cam2video":"4K@30fps, 1080p@30fps, 10-bit HDR","wlan":"Wi-Fi 802.11 a/b/g/n/ac/6, dual-band, Wi-Fi Direct","bluetooth":"5.4, A2DP, LE","gps":"GPS, GALILEO, GLONASS, BDS, QZSS","nfc":"Yes (market/region dependent)","radio":"No","usb":"USB Type-C 2.0, OTG","sensors":"Fingerprint (under display, optical), accelerometer, gyro, compass","featuresother":"Virtual Proximity Sensing","batdescription1":"5000 mAh","colors":"Lavender, Black, White, Lime","models":"SM-A366E, SM-A366E/DS, SM-A366B, SM-A366B/DS, SM-A366U, SM-A366U1, SM-A366W","sar_us":"1.07 W/kg (head)","sar_eu":"0.53 W/kg (head) 1.29 W/kg (body)","price":"$ 349.99 / C$ 370.00 / £ 183.00 / € 187.78 / ₹ 31,945","tbench":"AnTuTu: 613492 (v10) GeekBench: 2917 (v6) 3DMark: 912 (Wild Life Extreme)","batlife2":"Active use score 11:38h","network_technology":"GSM / HSPA / LTE / 5G","network_2g_bands":"GSM 850 / 900 / 1800 / 1900","network_3g_bands":"HSDPA 850 / 900 / 1700(AWS) / 1900 / 2100","network_4g_bands":"1, 2, 3, 4, 5, 7, 8, 12, 17, 20, 25, 26, 28, 32, 38, 40, 41, 66 - International","network_5g_bands":"1, 3, 5, 7, 8, 20, 28, 38, 40, 41, 66, 77, 78 SA/NSA/Sub6 - International","network_speed":"HSPA, LTE, 5G","launch_announced":"2025, March 02","launch_status":"Available. Released 2025, March 10","body_dimensions":"162.9 x 78.2 x 7.4 mm (6.41 x 3.08 x 0.29 in)","body_weight":"195 g (6.88 oz)","body_build":"Glass front (Gorilla Glass Victus+), plastic frame, glass back (Gorilla Glass Victus+)","body_sim":"· Nano-SIM + eSIM· Nano-SIM + Nano-SIM + eSIM + eSIM (max 2 at a time)","display_type":"Super AMOLED, 120Hz, 1200 nits (HBM), 1900 nits (peak)","display_resolution":"1080 x 2340 pixels, 19.5:9 ratio (~385 ppi density)","display_protection":"Corning Gorilla Glass Victus+, Mohs level 5","platform_os":"Android 15, up to 6 major Android upgrades, One UI 7","platform_chipset":"Qualcomm SM6475-AB Snapdragon 6 Gen 3 (4 nm)","platform_cpu":"Octa-core (4x2.4 GHz Cortex-A78 & 4x1.8 GHz Cortex-A55)","platform_gpu":"Adreno 710","memory_card_slot":"No","memory_internal":"128GB 6GB RAM, 128GB 8GB RAM, 256GB 6GB RAM, 256GB 8GB RAM, 256GB 12GB RAM","main_camera_triple":"50 MP, f/1.8, (wide), 1/1.96\", PDAF, OIS 8 MP, f/2.2, 123˚, (ultrawide), 1/4.0\", 1.12µm 5 MP (macro)","main_camera_features":"LED flash, panorama, HDR","main_camera_video":"4K@30fps, 1080p@30/60fps, gyro-EIS","selfie_camera_single":"12 MP, f/2.2, (wide)","selfie_camera_video":"4K@30fps, 1080p@30fps, 10-bit HDR","sound_loudspeaker":"Yes, with stereo speakers","sound_3_5mm_jack":"No","comms_wlan":"Wi-Fi 802.11 a/b/g/n/ac/6, dual-band, Wi-Fi Direct","comms_bluetooth":"5.4, A2DP, LE","comms_positioning":"GPS, GALILEO, GLONASS, BDS, QZSS","comms_nfc":"Yes (market/region dependent)","comms_radio":"No","comms_usb":"USB Type-C 2.0, OTG","features_sensors":"Fingerprint (under display, optical), accelerometer, gyro, compass","battery_type":"5000 mAh","battery_charging":"45W wired, 66% in 30 min, 100% in 68 min","misc_colors":"Lavender, Black, White, Lime","misc_models":"SM-A366E, SM-A366E/DS, SM-A366B, SM-A366B/DS, SM-A366U, SM-A366U1, SM-A366W","misc_sar":"1.07 W/kg (head)","misc_sar_eu":"0.53 W/kg (head) 1.29 W/kg (body)","misc_price":"$ 349.99 / C$ 370.00 / £ 183.00 / € 187.78 / ₹ 31,945","our_tests_performance":"AnTuTu: 613492 (v10) GeekBench: 2917 (v6) 3DMark: 912 (Wild Life Extreme)","our_tests_display":"1233 nits max brightness (measured)","our_tests_loudspeaker":"-26.2 LUFS (Good)","our_tests_battery":"Active use score 11:38h","eu_label_energy":"Class C","eu_label_battery":"41:28h endurance, 2000 cycles","eu_label_free_fall":"Class C (90 falls)","eu_label_repairability":"Class C"},
+            {"maker_id":9,"phone_id":14041,"brand":"Samsung","name":"Samsung Galaxy A17","model_name":"Galaxy A17 5G","search_tokens":"5G Notch","url":"https://www.gsmarena.com/samsung_galaxy_a17_5g-14041.php","image_url":"https://fdn2.gsmarena.com/vv/bigpic/samsung-galaxy-a17-5g.jpg","_source":"GSM Arena API + Detail Page","announced":"Released 2025, August 14","os":"Android 15, up to 6 major Android upgrades, One UI 7","display_size":"6.7 inches, 110.2 cm2 (~86.0% screen-to-body ratio)","display_res":"1080x2340 pixels","camera_pixels":"50","ram_size":"4-8","battery_size":"5000","modelname":"Samsung Galaxy A17","released_hl":"Released 2025, August 14","body_hl":"192g, 7.5mm thickness","os_hl":"Android 15, up to 6 major upgrades, One UI 7","storage_hl":"128GB/256GB storage, microSDXC","displaysize_hl":"6.7\"","displayres_hl":"1080x2340 pixels","camerapixels_hl":"50","videopixels_hl":"1080p","ramsize_hl":"4-8","chipset_hl":"Exynos 1330","batsize_hl":"5000","battype_hl":"25W","nettech":"GSM / HSPA / LTE / 5G","net2g":"GSM 850 / 900 / 1800 / 1900","net3g":"HSDPA 850 / 900 / 1700(AWS) / 1900 / 2100","net4g":"1, 2, 3, 4, 5, 7, 8, 12, 17, 20, 28, 38, 40, 41, 66","net5g":"1, 3, 5, 7, 8, 20, 28, 38, 40, 41, 66, 77, 78 SA/NSA/Sub6 - International","speed":"HSPA, LTE, 5G","year":"2025, August 06","status":"Available. Released 2025, August 14","dimensions":"164.4 x 77.9 x 7.5 mm (6.47 x 3.07 x 0.30 in)","weight":"192 g (6.77 oz)","build":"Glass front (Gorilla Glass Victus), plastic frame, fiber-reinforced plastic back","sim":"· Nano-SIM· Nano-SIM + eSIM· Nano-SIM + Nano-SIM","bodyother":"IP54 dust protected and water resistant (water splashes)","displaytype":"Super AMOLED, 90Hz, 800 nits (HBM)","displaysize":"6.7 inches, 110.2 cm2 (~86.0% screen-to-body ratio)","displayresolution":"1080 x 2340 pixels, 19.5:9 ratio (~385 ppi density)","displayprotection":"Corning Gorilla Glass Victus, Mohs level 5","chipset":"Exynos 1330 (5 nm)","cpu":"Octa-core (2x2.4 GHz Cortex-A78 & 6x2.0 GHz Cortex-A55)","gpu":"Mali-G68 MP2","memoryslot":"microSDXC (uses shared SIM slot)","internalmemory":"128GB 4GB RAM, 128GB 6GB RAM, 128GB 8GB RAM, 256GB 4GB RAM, 256GB 8GB RAM","cam1modules":"50 MP, f/1.8, (wide), 1/2.76\", 0.64µm, AF, OIS 5 MP, f/2.2, (ultrawide), 1/5.0\", 1.12µm 2 MP (macro)","cam1features":"LED flash, panorama, HDR","cam1video":"1080p@30fps, gyro-EIS","cam2modules":"13 MP, f/2.0, (wide), 1/3.1\", 1.12µm","cam2video":"1080p@30fps","wlan":"Wi-Fi 802.11 a/b/g/n/ac, dual-band, Wi-Fi Direct","bluetooth":"5.3, A2DP, LE","gps":"GPS, GALILEO, GLONASS, BDS, QZSS","nfc":"Yes (market/region dependent)","radio":"No","usb":"USB Type-C 2.0","sensors":"Fingerprint (side-mounted), accelerometer, gyro, proximity, compass","batdescription1":"5000 mAh","colors":"Black, Gray, Blue","models":"SM-A176B, SM-A176B/DS","sar_eu":"0.67 W/kg (head) 0.97 W/kg (body)","price":"$ 99.88 / C$ 254.90 / £ 159.99 / € 162.50 / ₹ 20,499","tbench":"AnTuTu: 435787 (v10) GeekBench: 2048 (v6) 3DMark: 365 (Wild Life Extreme)","batlife2":"Active use score 11:48h","network_technology":"GSM / HSPA / LTE / 5G","network_2g_bands":"GSM 850 / 900 / 1800 / 1900","network_3g_bands":"HSDPA 850 / 900 / 1700(AWS) / 1900 / 2100","network_4g_bands":"1, 2, 3, 4, 5, 7, 8, 12, 17, 20, 28, 38, 40, 41, 66","network_5g_bands":"1, 3, 5, 7, 8, 20, 28, 38, 40, 41, 66, 77, 78 SA/NSA/Sub6 - International","network_speed":"HSPA, LTE, 5G","launch_announced":"2025, August 06","launch_status":"Available. Released 2025, August 14","body_dimensions":"164.4 x 77.9 x 7.5 mm (6.47 x 3.07 x 0.30 in)","body_weight":"192 g (6.77 oz)","body_build":"Glass front (Gorilla Glass Victus), plastic frame, fiber-reinforced plastic back","body_sim":"· Nano-SIM· Nano-SIM + eSIM· Nano-SIM + Nano-SIM","display_type":"Super AMOLED, 90Hz, 800 nits (HBM)","display_resolution":"1080 x 2340 pixels, 19.5:9 ratio (~385 ppi density)","display_protection":"Corning Gorilla Glass Victus, Mohs level 5","platform_os":"Android 15, up to 6 major Android upgrades, One UI 7","platform_chipset":"Exynos 1330 (5 nm)","platform_cpu":"Octa-core (2x2.4 GHz Cortex-A78 & 6x2.0 GHz Cortex-A55)","platform_gpu":"Mali-G68 MP2","memory_card_slot":"microSDXC (uses shared SIM slot)","memory_internal":"128GB 4GB RAM, 128GB 6GB RAM, 128GB 8GB RAM, 256GB 4GB RAM, 256GB 8GB RAM","main_camera_triple":"50 MP, f/1.8, (wide), 1/2.76\", 0.64µm, AF, OIS 5 MP, f/2.2, (ultrawide), 1/5.0\", 1.12µm 2 MP (macro)","main_camera_features":"LED flash, panorama, HDR","main_camera_video":"1080p@30fps, gyro-EIS","selfie_camera_single":"13 MP, f/2.0, (wide), 1/3.1\", 1.12µm","selfie_camera_video":"1080p@30fps","sound_loudspeaker":"Yes","sound_3_5mm_jack":"No","comms_wlan":"Wi-Fi 802.11 a/b/g/n/ac, dual-band, Wi-Fi Direct","comms_bluetooth":"5.3, A2DP, LE","comms_positioning":"GPS, GALILEO, GLONASS, BDS, QZSS","comms_nfc":"Yes (market/region dependent)","comms_radio":"No","comms_usb":"USB Type-C 2.0","features_sensors":"Fingerprint (side-mounted), accelerometer, gyro, proximity, compass","battery_type":"5000 mAh","battery_charging":"25W wired","misc_colors":"Black, Gray, Blue","misc_models":"SM-A176B, SM-A176B/DS","misc_sar_eu":"0.67 W/kg (head) 0.97 W/kg (body)","misc_price":"$ 99.88 / C$ 254.90 / £ 159.99 / € 162.50 / ₹ 20,499","our_tests_performance":"AnTuTu: 435787 (v10) GeekBench: 2048 (v6) 3DMark: 365 (Wild Life Extreme)","our_tests_display":"738 nits max brightness (measured)","our_tests_loudspeaker":"-26.4 LUFS (Good)","our_tests_battery":"Active use score 11:48h","eu_label_energy":"Class B","eu_label_battery":"43:52h endurance, 1200 cycles","eu_label_free_fall":"Class B (180 falls)","eu_label_repairability":"Class C"},
+            {"maker_id":9,"phone_id":14066,"brand":"Samsung","name":"Samsung Galaxy A07 4G","model_name":"Galaxy A07","search_tokens":"Notch","url":"https://www.gsmarena.com/samsung_galaxy_a07-14066.php","image_url":"https://fdn2.gsmarena.com/vv/bigpic/samsung-galaxy-a07.jpg","_source":"GSM Arena API + Detail Page","announced":"Released 2025, August 25","os":"Android 15, up to 6 major Android upgrades, One UI 8","display_size":"6.7 inches, 108.4 cm2 (~83.6% screen-to-body ratio)","display_res":"720x1600 pixels","camera_pixels":"50","ram_size":"4-8","battery_size":"5000","modelname":"Samsung Galaxy A07 4G","released_hl":"Released 2025, August 25","body_hl":"184g, 7.6mm thickness","os_hl":"Android 15, up to 6 major upgrades, One UI 8","storage_hl":"64GB/128GB/256GB storage, microSDXC","displaysize_hl":"6.7\"","displayres_hl":"720x1600 pixels","camerapixels_hl":"50","videopixels_hl":"1080p","ramsize_hl":"4-8","chipset_hl":"Helio G99","batsize_hl":"5000","battype_hl":"25W","nettech":"GSM / HSPA / LTE","net2g":"GSM 850 / 900 / 1800 / 1900","net3g":"HSDPA 850 / 900 / 2100","net4g":"1, 3, 5, 7, 8, 20, 28, 38, 40, 41","speed":"HSPA, LTE","year":"2025, August 25","status":"Available. Released 2025, August 25","dimensions":"167.4 x 77.4 x 7.6 mm (6.59 x 3.05 x 0.30 in)","weight":"184 g (6.49 oz)","build":"Glass front, plastic back, plastic frame","sim":"Nano-SIM + Nano-SIM","bodyother":"IP54 dust protected and water resistant (water splashes)","displaytype":"PLS LCD, 90Hz","displaysize":"6.7 inches, 108.4 cm2 (~83.6% screen-to-body ratio)","displayresolution":"720 x 1600 pixels, 20:9 ratio (~262 ppi density)","chipset":"Mediatek Helio G99 (6 nm)","cpu":"Octa-core (2x2.2 GHz Cortex-A76 & 6x2.0 GHz Cortex-A55)","gpu":"Mali-G57 MC2","memoryslot":"microSDXC (dedicated slot)","internalmemory":"64GB 4GB RAM, 128GB 4GB RAM, 128GB 6GB RAM, 256GB 8GB RAM","memoryother":"UFS 2.2","cam1modules":"50 MP, f/1.8, (wide), 1/2.76\", 0.64µm, PDAF Auxiliary lens","cam1features":"LED flash","cam1video":"1080p@30/60fps","cam2modules":"8 MP, f/2.0, (wide), 1/4.0\", 1.12µm","cam2video":"Yes","wlan":"Wi-Fi 802.11 a/b/g/n/ac, dual-band, Wi-Fi Direct","bluetooth":"5.3, A2DP, LE","gps":"GPS, GLONASS, GALILEO, BDS","nfc":"No","radio":"FM radio","usb":"USB Type-C 2.0","sensors":"Fingerprint (side-mounted), accelerometer, proximity","batdescription1":"5000 mAh","colors":"Gray, Light Violet, Dark Green","models":"SM-A075B, SM-A075B/DS, SM-A075F, SM-A075F/DS, SM-A075M, SM-A075M/DS","sar_us":"0.33 W/kg (head) 1.18 W/kg (body)","sar_eu":"0.19 W/kg (head) 1.33 W/kg (body)","price":"$ 108.00 / £ 76.18","tbench":"AnTuTu: 394421 (v10) GeekBench: 1941 (v6) 3DMark: 338 (Wild Life Extreme)","batlife2":"Active use score 12:44h","network_technology":"GSM / HSPA / LTE","network_2g_bands":"GSM 850 / 900 / 1800 / 1900","network_3g_bands":"HSDPA 850 / 900 / 2100","network_4g_bands":"1, 3, 5, 7, 8, 20, 28, 38, 40, 41","network_speed":"HSPA, LTE","launch_announced":"2025, August 25","launch_status":"Available. Released 2025, August 25","body_dimensions":"167.4 x 77.4 x 7.6 mm (6.59 x 3.05 x 0.30 in)","body_weight":"184 g (6.49 oz)","body_build":"Glass front, plastic back, plastic frame","body_sim":"Nano-SIM + Nano-SIM","display_type":"PLS LCD, 90Hz","display_resolution":"720 x 1600 pixels, 20:9 ratio (~262 ppi density)","platform_os":"Android 15, up to 6 major Android upgrades, One UI 8","platform_chipset":"Mediatek Helio G99 (6 nm)","platform_cpu":"Octa-core (2x2.2 GHz Cortex-A76 & 6x2.0 GHz Cortex-A55)","platform_gpu":"Mali-G57 MC2","memory_card_slot":"microSDXC (dedicated slot)","memory_internal":"64GB 4GB RAM, 128GB 4GB RAM, 128GB 6GB RAM, 256GB 8GB RAM","main_camera_dual":"50 MP, f/1.8, (wide), 1/2.76\", 0.64µm, PDAF Auxiliary lens","main_camera_features":"LED flash","main_camera_video":"1080p@30/60fps","selfie_camera_single":"8 MP, f/2.0, (wide), 1/4.0\", 1.12µm","selfie_camera_video":"Yes","sound_loudspeaker":"Yes","sound_3_5mm_jack":"Yes","comms_wlan":"Wi-Fi 802.11 a/b/g/n/ac, dual-band, Wi-Fi Direct","comms_bluetooth":"5.3, A2DP, LE","comms_positioning":"GPS, GLONASS, GALILEO, BDS","comms_nfc":"No","comms_radio":"FM radio","comms_usb":"USB Type-C 2.0","features_sensors":"Fingerprint (side-mounted), accelerometer, proximity","battery_type":"5000 mAh","battery_charging":"25W wired","misc_colors":"Gray, Light Violet, Dark Green","misc_models":"SM-A075B, SM-A075B/DS, SM-A075F, SM-A075F/DS, SM-A075M, SM-A075M/DS","misc_sar":"0.33 W/kg (head) 1.18 W/kg (body)","misc_sar_eu":"0.19 W/kg (head) 1.33 W/kg (body)","misc_price":"$ 108.00 / £ 76.18","our_tests_performance":"AnTuTu: 394421 (v10) GeekBench: 1941 (v6) 3DMark: 338 (Wild Life Extreme)","our_tests_display":"1128:1 contrast ratio, 468 nits max brightness (measured)","our_tests_loudspeaker":"-27.5 LUFS (Good)","our_tests_battery":"Active use score 12:44h"},
+            {"maker_id":9,"phone_id":13610,"brand":"Samsung","name":"Galaxy S25","model_name":"Galaxy S25","search_tokens":"5G Notch PHC sgs25 galaxys25","url":"https://www.gsmarena.com/samsung_galaxy_s25-13610.php","image_url":"https://fdn2.gsmarena.com/vv/bigpic/samsung-galaxy-s25-sm-s931.jpg","_source":"GSM Arena API + Detail Page"}
         ];
 
         const slotsData = [null, null, null, null];
@@ -102,67 +103,39 @@
             timers[index] = setTimeout(() => buscar(index, query), 500);
         }
 
-        async function buscar(index, query) {
+        function buscar(index, query) {
             const resDiv = document.getElementById(`result-${index}`);
-            resDiv.innerHTML = '<div class="flex justify-center py-2"><div class="loading"></div></div>';
+            const queryUpper = query.toUpperCase();
+            const resultados = phoneDatabase.filter(d => 
+                (d.brand + ' ' + d.name).toUpperCase().includes(queryUpper) ||
+                (d.name).toUpperCase().includes(queryUpper)
+            );
 
-            // 1. Tenta buscar no banco Local primeiro
-            const locais = dbLocal.filter(d => d.name.includes(query.toUpperCase()));
-            
-            try {
-                const res = await fetch(`https://${HOST}/gsm/search-query/${query}`, {
-                    method: 'GET',
-                    headers: { 'X-RapidAPI-Key': API_KEY, 'X-RapidAPI-Host': HOST }
-                });
-                const apiData = await res.json();
-                
-                resDiv.innerHTML = '';
-                // Une Local + API
-                const total = [...locais, ...(Array.isArray(apiData) ? apiData : [])];
-
-                total.slice(0, 10).forEach(item => {
-                    const btn = document.createElement('button');
-                    btn.className = "w-full text-left p-3 rounded-xl bg-white/5 text-[10px] font-bold hover:bg-emerald-500 hover:text-black transition-all border border-white/5 mb-1 flex justify-between items-center uppercase truncate";
-                    const nomeExibir = item.name ? `${item.brand} ${item.name}` : `${item.brand || ''} ${item.device_name || item.title}`;
-                    btn.innerHTML = `<span>${nomeExibir}</span> ${item.rumor ? '<span class="tag-rumor">RUMOR</span>' : ''}`;
-                    btn.onclick = () => selecionar(index, item);
-                    resDiv.appendChild(btn);
-                });
-            } catch (e) {
-                // Se a API falhar, mostra pelo menos os locais
-                resDiv.innerHTML = '';
-                locais.forEach(item => {
-                    const btn = document.createElement('button');
-                    btn.className = "w-full text-left p-3 rounded-xl bg-white/5 text-[10px] font-bold hover:bg-emerald-500 hover:text-black border border-white/5 mb-1 uppercase";
-                    btn.innerText = `${item.brand} ${item.name}`;
-                    btn.onclick = () => selecionar(index, item);
-                    resDiv.appendChild(btn);
-                });
+            resDiv.innerHTML = '';
+            if (resultados.length === 0) {
+                resDiv.innerHTML = '<p class="text-center text-xs text-white/40 p-3">Nenhum aparelho encontrado.</p>';
+                return;
             }
+
+            resultados.slice(0, 10).forEach(item => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-3 rounded-xl bg-white/5 text-[10px] font-bold hover:bg-emerald-500 hover:text-black transition-all border border-white/5 mb-1 flex justify-between items-center uppercase truncate";
+                const nomeExibir = `${item.brand} ${item.name}`;
+                const isRumor = item.status && item.status.toLowerCase() === 'rumored';
+                btn.innerHTML = `<span>${nomeExibir}</span> ${isRumor ? '<span class="tag-rumor">RUMOR</span>' : ''}`;
+                btn.onclick = () => selecionar(index, item);
+                resDiv.appendChild(btn);
+            });
         }
 
-        async function selecionar(index, item) {
+        function selecionar(index, item) {
             const slotEl = document.getElementById(`slot-${index}`);
-            const slug = item.slug || item.id;
-            
-            if (item.rumor) {
-                // Se for rumor, usa os dados do banco local
-                slotsData[index] = { phoneDetails: { brandValue: item.brand, modelValue: item.name, yearValue: "2025/26" }, gsmPlatformDetails: { platformCpu: item.cpu }, gsmMemoryDetails: { memoryInternal: item.ram + " / " + item.storage }, gsmMainCameraDetails: { mainCameraQuad: item.cam }, gsmBatteryDetails: { batteryType: item.bat }, gsmDisplayDetails: { displayType: item.screen }, gsmFeaturesDetails: { featuresOther1: item.sensor } };
-            } else {
-                // Se for real, tenta baixar da API
-                try {
-                    const res = await fetch(`https://${HOST}/gsm/get-specifications-by-slug/${slug}`, {
-                        method: 'GET',
-                        headers: { 'X-RapidAPI-Key': API_KEY, 'X-RapidAPI-Host': HOST }
-                    });
-                    slotsData[index] = await res.json();
-                } catch (e) { alert("API ocupada. Tente outro modelo."); return; }
-            }
+            slotsData[index] = item; // O objeto inteiro do nosso banco de dados já tem tudo!
 
             slotEl.classList.add('slot-confirmed');
             slotEl.innerHTML = `
                 <div class="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center mb-2"><svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7"></path></svg></div>
-                <p class="text-[10px] font-black text-center uppercase tracking-tighter">${item.name || item.device_name}</p>
+                <p class="text-[10px] font-black text-center uppercase tracking-tighter">${item.brand} ${item.name}</p>
                 <button onclick="remover(${index})" class="mt-4 text-[9px] font-bold text-red-400 opacity-60 hover:opacity-100 uppercase transition-all">Remover</button>
             `;
             document.getElementById('battleBtn').disabled = slotsData.filter(s => s !== null).length < 2;
@@ -205,54 +178,54 @@
             head.innerHTML = `
                 <tr>
                     <th class="p-5 spec-sidebar">Ficha Técnica</th>
-                    ${ativos.map(p => `<th class="p-5 device-col font-black text-xs uppercase text-emerald-400">${p.phoneDetails?.brandValue || ''}<br><span class="text-white text-sm">${p.phoneDetails?.modelValue || 'Smartphone'}</span></th>`).join('')}
+                    ${ativos.map(p => `<th class="p-5 device-col font-black text-xs uppercase text-emerald-400">${p.brand || ''}<br><span class="text-white text-sm">${p.name || 'Smartphone'}</span></th>`).join('')}
                 </tr>
             `;
 
             const rows = [
                 { cat: '📱 DESIGN E CORPO' },
-                { label: 'Dimensões', val: p => p.gsmBodyDetails?.bodyDimensions || p.bodyDimensions || '-' },
-                { label: 'Peso', val: p => p.gsmBodyDetails?.bodyWeight || p.bodyWeight || '-' },
-                { label: 'Construção', val: p => p.gsmBodyDetails?.bodyBuild || p.bodyBuild || '-' },
-                { label: 'Chips (SIM)', val: p => p.gsmBodyDetails?.bodySim || p.bodySim || '-' },
+                { label: 'Dimensões', val: p => p.body_dimensions || p.dimensions || '-' },
+                { label: 'Peso', val: p => p.body_weight || p.weight || '-' },
+                { label: 'Construção', val: p => p.body_build || p.build || '-' },
+                { label: 'Chips (SIM)', val: p => p.body_sim || p.sim || '-' },
                 
                 { cat: '🖥️ TELA' },
-                { label: 'Tipo', val: p => p.gsmDisplayDetails?.displayType || p.displayType || p.screen || '-' },
-                { label: 'Tamanho', val: p => p.gsmDisplayDetails?.displaySize || p.displaySize || '-' },
-                { label: 'Resolução', val: p => p.gsmDisplayDetails?.displayResolution || p.displayResolution || '-' },
-                { label: 'Proteção', val: p => p.gsmDisplayDetails?.displayProtection || p.displayProtection || '-' },
+                { label: 'Tipo', val: p => p.display_type || p.displaytype || '-' },
+                { label: 'Tamanho', val: p => p.display_size || p.displaysize || '-' },
+                { label: 'Resolução', val: p => p.display_resolution || p.displayresolution || '-' },
+                { label: 'Proteção', val: p => p.display_protection || p.displayprotection || '-' },
 
                 { cat: '⚙️ PLATAFORMA (HARDWARE)' },
-                { label: 'Sistema (OS)', val: p => p.gsmPlatformDetails?.platformOs || p.platformOs || '-' },
-                { label: 'Processador (CPU)', val: p => p.gsmPlatformDetails?.platformCpu || p.cpu || '-' },
-                { label: 'Chipset', val: p => p.gsmPlatformDetails?.platformChipset || p.chipset || '-' },
-                { label: 'GPU', val: p => p.gsmPlatformDetails?.platformGpu || p.gpu || '-' },
+                { label: 'Sistema (OS)', val: p => p.platform_os || p.os || '-' },
+                { label: 'Processador (CPU)', val: p => p.platform_cpu || p.cpu || '-' },
+                { label: 'Chipset', val: p => p.platform_chipset || p.chipset || '-' },
+                { label: 'GPU', val: p => p.platform_gpu || p.gpu || '-' },
 
                 { cat: '💾 MEMÓRIA' },
-                { label: 'Interna (RAM e ROM)', val: p => p.gsmMemoryDetails?.memoryInternal || p.ram || '-' },
-                { label: 'Cartão de Memória', val: p => p.gsmMemoryDetails?.memoryCardSlot || p.memoryCardSlot || '-' },
+                { label: 'Interna (RAM e ROM)', val: p => p.memory_internal || p.internalmemory || '-' },
+                { label: 'Cartão de Memória', val: p => p.memory_card_slot || p.memoryslot || '-' },
 
                 { cat: '📸 CÂMERA PRINCIPAL' },
-                { label: 'Sensores', val: p => p.gsmMainCameraDetails?.mainCameraQuad || p.gsmMainCameraDetails?.mainCameraTriple || p.gsmMainCameraDetails?.mainCameraDual || p.gsmMainCameraDetails?.mainCameraSingle || p.cam || '-' },
-                { label: 'Recursos', val: p => p.gsmMainCameraDetails?.mainCameraFeatures || '-' },
-                { label: 'Vídeo', val: p => p.gsmMainCameraDetails?.mainCameraVideo || '-' },
+                { label: 'Sensores', val: p => p.main_camera_quad || p.main_camera_triple || p.main_camera_dual || p.main_camera_single || p.cam1modules || '-' },
+                { label: 'Recursos', val: p => p.main_camera_features || p.cam1features || '-' },
+                { label: 'Vídeo', val: p => p.main_camera_video || p.cam1video || '-' },
 
                 { cat: '🤳 CÂMERA FRONTAL' },
-                { label: 'Sensores', val: p => p.gsmSelfieCameraDetails?.selfieCameraSingle || p.gsmSelfieCameraDetails?.selfieCameraDual || '-' },
-                { label: 'Vídeo', val: p => p.gsmSelfieCameraDetails?.selfieCameraVideo || '-' },
+                { label: 'Sensores', val: p => p.selfie_camera_single || p.selfie_camera_dual || p.cam2modules || '-' },
+                { label: 'Vídeo', val: p => p.selfie_camera_video || p.cam2video || '-' },
 
                 { cat: '🔊 ÁUDIO E CONEXÕES' },
-                { label: 'Alto-falantes', val: p => p.gsmSoundDetails?.soundLoudspeaker || '-' },
-                { label: 'Wi-Fi', val: p => p.gsmCommsDetails?.commsWlan || '-' },
-                { label: 'Bluetooth', val: p => p.gsmCommsDetails?.commsBluetooth || '-' },
-                { label: 'GPS', val: p => p.gsmCommsDetails?.commsPositioning || p.gsmCommsDetails?.commsGps || '-' },
-                { label: 'NFC', val: p => p.gsmCommsDetails?.commsNfc || '-' },
-                { label: 'USB', val: p => p.gsmCommsDetails?.commsUsb || '-' },
+                { label: 'Alto-falantes', val: p => p.sound_loudspeaker || '-' },
+                { label: 'Wi-Fi', val: p => p.comms_wlan || p.wlan || '-' },
+                { label: 'Bluetooth', val: p => p.comms_bluetooth || p.bluetooth || '-' },
+                { label: 'GPS', val: p => p.comms_positioning || p.gps || '-' },
+                { label: 'NFC', val: p => p.comms_nfc || p.nfc || '-' },
+                { label: 'USB', val: p => p.comms_usb || p.usb || '-' },
 
                 { cat: '🔋 BATERIA E EXTRAS' },
-                { label: 'Sensores', val: p => p.gsmFeaturesDetails?.featuresSensors || p.sensor || '-' },
-                { label: 'Capacidade', val: p => p.gsmBatteryDetails?.batteryType || p.bat || '-' },
-                { label: 'Carregamento', val: p => p.gsmBatteryDetails?.batteryCharging || '-' }
+                { label: 'Sensores', val: p => p.features_sensors || p.sensors || '-' },
+                { label: 'Capacidade', val: p => p.battery_type || p.batdescription1 || '-' },
+                { label: 'Carregamento', val: p => p.battery_charging || '-' }
             ];
 
             body.innerHTML = rows.map(r => {
