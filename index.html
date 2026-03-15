@@ -97,20 +97,34 @@
 
             try {
                 const response = await fetch(`https://api.apify.com/v2/datasets/${DATASET_ID}/items?token=${APIFY_TOKEN}`);
+                
+                // Verifica se a API recusou a conexão (Token inválido, Dataset inexistente, etc)
+                if (!response.ok) {
+                    throw new Error(`Erro na API (${response.status}): Verifique se o Dataset ID está correto.`);
+                }
+
                 const data = await response.json();
                 
                 if(Array.isArray(data)) {
                     phoneDatabase = data;
                 }
                 
+                // Se conectou, mas o arquivo está vazio:
+                if (phoneDatabase.length === 0) {
+                    alert("⚠️ O seu banco de dados na Apify está VAZIO (0 aparelhos)!\n\nO seu Dataset expirou ou o robô não encontrou nada. Vá na Apify, rode o Actor novamente e coloque o NOVO 'Dataset ID' no código.");
+                }
+
                 // Libera os campos para pesquisa
                 for(let i=0; i<4; i++) {
                     const input = document.getElementById(`input-${i}`);
-                    if(input) { input.placeholder = `Buscar em ${phoneDatabase.length} modelos...`; input.disabled = false; }
+                    if(input) { 
+                        input.placeholder = phoneDatabase.length > 0 ? `Buscar em ${phoneDatabase.length} modelos...` : "Banco de dados vazio!"; 
+                        input.disabled = phoneDatabase.length === 0; 
+                    }
                 }
             } catch (error) {
                 console.error("Erro ao puxar dados da Apify:", error);
-                alert("Erro ao conectar com a Apify. Verifique se o DATASET_ID está correto.");
+                alert("Erro de Conexão com a Apify:\n" + error.message);
             }
         }
         
