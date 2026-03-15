@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Batalha de Specs - O Comparador n.º 1</title>
+    <title>Batalha de Specs - Rumores e Lançamentos</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
@@ -16,7 +16,7 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-thumb { background: #10b981; border-radius: 10px; }
-        .dropdown-results { max-height: 250px; overflow-y: auto; z-index: 50; }
+        .tag-rumor { background: #f59e0b; color: black; font-size: 7px; padding: 2px 5px; border-radius: 4px; font-weight: 900; }
     </style>
 </head>
 <body class="p-4 md:p-10">
@@ -28,22 +28,22 @@
 
     <header class="max-w-7xl mx-auto text-center mb-10">
         <h1 class="text-4xl md:text-6xl font-extrabold bg-gradient-to-r from-emerald-400 to-teal-200 bg-clip-text text-transparent italic tracking-tighter uppercase">BATALHA DE SPECS</h1>
-        <p class="text-emerald-500/60 text-[10px] font-bold tracking-[0.4em] uppercase mt-2">Tecnologia, Comparação e Preços</p>
+        <p class="text-emerald-500/60 text-[10px] font-bold tracking-[0.4em] uppercase mt-2 text-center">O Único com Rumores do S25 e S26</p>
     </header>
 
     <main class="max-w-7xl mx-auto">
         <div id="setupArea">
-            <!-- 4 COLUNAS DE BUSCA INSTANTÂNEA -->
+            <!-- GRID DE 4 COLUNAS -->
             <div id="searchGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
                 <script>
                     for(let i=0; i<4; i++) {
                         document.write(`
                             <div class="slot glass p-6 rounded-[2.5rem] flex flex-col items-center gap-4 border-white/5 transition-all relative" id="slot-${i}">
-                                <span class="text-[9px] font-black text-emerald-500/40 uppercase tracking-widest">Aparelho 0${i+1}</span>
-                                <input type="text" placeholder="Digite para buscar..." 
+                                <span class="text-[9px] font-black text-emerald-500/40 uppercase tracking-widest uppercase">Aparelho 0${i+1}</span>
+                                <input type="text" placeholder="Busque S24, S25, iPhone..." 
                                        oninput="debounceSearch(${i}, this.value)"
                                        class="w-full bg-white/5 border border-white/10 rounded-full px-5 py-3 text-[11px] outline-none focus:border-emerald-500 transition-all uppercase">
-                                <div id="result-${i}" class="dropdown-results w-full space-y-1 mt-2"></div>
+                                <div id="result-${i}" class="w-full space-y-1 mt-2 max-h-48 overflow-y-auto"></div>
                             </div>
                         `);
                     }
@@ -79,13 +79,17 @@
         const slotsData = [null, null, null, null];
         let timers = [null, null, null, null];
 
-        // Função para não estourar a API (espera o usuário parar de digitar)
+        // BANCO DE RUMORES (Você pode alimentar isso sempre que quiser)
+        const bancoRumores = [
+            { id: "rumor_s25_ultra", brand_name: "Samsung", phone_model: "Galaxy S25 Ultra", isRumor: true, description: "Features 6.9″ display, Snapdragon 8 Gen 4, 200MP camera, 5500 mAh battery, 16GB RAM.", image_url: "https://t2.tstatic.net/titles/samsung-galaxy-s25-ultra-1.jpg" },
+            { id: "rumor_s25_fe", brand_name: "Samsung", phone_model: "Galaxy S25 FE", isRumor: true, description: "Features 6.7″ display, Exynos 2500, 50MP camera, 4800 mAh battery, 8GB RAM.", image_url: "" },
+            { id: "rumor_s26_ultra", brand_name: "Samsung", phone_model: "Galaxy S26 Ultra", isRumor: true, description: "Features 7.0″ display, Snapdragon 8 Gen 5, 300MP camera, 6000 mAh battery, 24GB RAM.", image_url: "" },
+            { id: "rumor_iphone_17_pro", brand_name: "Apple", phone_model: "iPhone 17 Pro Max", isRumor: true, description: "Features 6.9″ display, Apple A19 Pro, 48MP triple camera, 4800 mAh battery, 12GB RAM.", image_url: "" }
+        ];
+
         function debounceSearch(index, query) {
             clearTimeout(timers[index]);
-            if (query.length < 2) {
-                document.getElementById(`result-${index}`).innerHTML = '';
-                return;
-            }
+            if (query.length < 2) return;
             timers[index] = setTimeout(() => buscarNoSlot(index, query), 500);
         }
 
@@ -93,60 +97,59 @@
             const resDiv = document.getElementById(`result-${index}`);
             resDiv.innerHTML = '<div class="flex justify-center py-4"><div class="loading-spin"></div></div>';
 
+            // 1. Busca primeiro nos Rumores Locais
+            const rumoresFiltrados = bancoRumores.filter(r => r.phone_model.toLowerCase().includes(query.toLowerCase()));
+            
             try {
+                // 2. Busca na API
                 const response = await fetch(`https://${HOST}/2165/search?q=${encodeURIComponent(query)}`, {
                     method: 'GET',
                     headers: { 'X-RapidAPI-Key': API_KEY, 'X-RapidAPI-Host': HOST }
                 });
                 const responseData = await response.json();
-                const results = responseData.data || [];
+                const apiResults = responseData.data || [];
+
+                // Unir Rumores + API
+                const resultadosFinais = [...rumoresFiltrados, ...apiResults];
 
                 resDiv.innerHTML = '';
-                results.slice(0, 6).forEach(item => {
+                resultadosFinais.slice(0, 8).forEach(item => {
                     const btn = document.createElement('button');
-                    btn.className = "w-full text-left p-3 rounded-2xl bg-white/5 text-[10px] font-semibold hover:bg-emerald-500 hover:text-black transition-all border border-white/5 mb-1 truncate uppercase flex items-center gap-2";
-                    btn.innerHTML = `<span class="opacity-30">#</span> ${item.phone_model}`;
+                    btn.className = "w-full text-left p-3 rounded-2xl bg-white/5 text-[10px] font-semibold hover:bg-emerald-500 hover:text-black transition-all border border-white/5 mb-1 truncate flex justify-between items-center";
+                    btn.innerHTML = `<span>${item.phone_model}</span> ${item.isRumor ? '<span class="tag-rumor">RUMOR</span>' : ''}`;
                     btn.onclick = () => selecionarParaSlot(index, item);
                     resDiv.appendChild(btn);
                 });
+
+                // Se não achou nada, dar opção manual
+                if (resultadosFinais.length === 0) {
+                    resDiv.innerHTML = `<button onclick="addManual(${index}, '${query}')" class="w-full p-3 rounded-2xl bg-emerald-500/10 text-[10px] text-emerald-400 font-bold border border-emerald-500/30">Não encontrado. Criar Rumor Manual?</button>`;
+                }
+
             } catch (err) { console.error(err); }
+        }
+
+        function addManual(index, query) {
+            const mockup = { id: "manual", brand_name: "Custom", phone_model: query + " (Manual)", description: "Features 6.7″ display, High-End Chipset, 50MP camera, 5000 mAh battery, 12GB RAM.", image_url: "" };
+            selecionarParaSlot(index, mockup);
         }
 
         async function selecionarParaSlot(index, item) {
             const slotEl = document.getElementById(`slot-${index}`);
-            const specsFinais = {
-                brand: item.brand_name,
-                phone_name: item.phone_model,
-                description: item.description,
-                image_url: item.image_url,
-                id: item.id
-            };
-
-            // Tentativa de buscar specs full (mesmo que dê 404, usamos o fallback da descrição)
-            try {
-                const res = await fetch(`https://${HOST}/2165/specifications?id=${item.id}`, {
-                    method: 'GET',
-                    headers: { 'X-RapidAPI-Key': API_KEY, 'X-RapidAPI-Host': HOST }
-                });
-                if(res.ok) {
-                    const fullData = await res.json();
-                    specsFinais.fullSpecs = fullData.data || fullData;
-                }
-            } catch(e) {}
-
-            slotsData[index] = specsFinais;
+            slotsData[index] = item;
+            
             slotEl.classList.add('slot-confirmed');
             slotEl.innerHTML = `
-                <img src="${item.image_url || 'https://via.placeholder.com/100x150?text=Sem+Foto'}" class="h-28 object-contain mb-2 drop-shadow-2xl">
+                <img src="${item.image_url || 'https://via.placeholder.com/100x150?text=Rumor'}" class="h-28 object-contain mb-2 drop-shadow-2xl">
                 <p class="text-[11px] font-bold text-center uppercase italic">${item.phone_model}</p>
-                <button onclick="location.reload()" class="mt-2 text-[8px] font-bold text-red-400 uppercase tracking-widest">Remover</button>
+                <button onclick="location.reload()" class="mt-2 text-[8px] font-bold text-red-400 uppercase">Remover</button>
             `;
             document.getElementById('battleBtn').disabled = slotsData.filter(s => s !== null).length < 2;
         }
 
-        function extrair(p, regex, label) {
+        function extrair(p, regex) {
             const match = p.description.match(regex);
-            return match ? match[1] : "Consulte Loja";
+            return match ? match[1] : "Rumor / ND";
         }
 
         function iniciarBatalha() {
@@ -162,18 +165,17 @@
             head.innerHTML = `
                 <tr>
                     <th class="p-6 text-emerald-400 text-[10px] font-black italic tracking-widest uppercase">Atributo</th>
-                    ${selecionados.map(p => `<th class="p-6 text-center border-l border-white/5 font-black text-sm uppercase">${p.phone_name}</th>`).join('')}
+                    ${selecionados.map(p => `<th class="p-6 text-center border-l border-white/5 font-black text-sm uppercase">${p.phone_model}</th>`).join('')}
                 </tr>
             `;
 
             const rows = [
-                { label: 'Preço Médio (Est.)', val: p => extrair(p, /(\$\s?\d+)/, 'Preço') || "Consultar Varejo" },
-                { label: 'Processador', val: p => extrair(p, /([\w\s-]+chipset)/i, 'CPU') },
-                { label: 'Memória RAM', val: p => extrair(p, /(\d+\s+(?:GB|MB)\s+RAM)/i, 'RAM') },
-                { label: 'Câmera Principal', val: p => extrair(p, /(\d+\s+MP\s+primary)/i, 'Cam') },
-                { label: 'Bateria', val: p => extrair(p, /(\d+\s+mAh\s+battery)/i, 'Bat') },
-                { label: 'Tela', val: p => extrair(p, /(\d+\.?\d*[″"]\s+display)/i, 'Tela') },
-                { label: 'Armazenamento', val: p => extrair(p, /(\d+\s+GB\s+storage)/i, 'HD') }
+                { label: 'Processador', val: p => extrair(p, /([\w\s-]+chipset)/i) },
+                { label: 'Memória RAM', val: p => extrair(p, /(\d+\s+(?:GB|MB)\s+RAM)/i) },
+                { label: 'Câmera Principal', val: p => extrair(p, /(\d+\s+MP\s+primary)/i) },
+                { label: 'Bateria', val: p => extrair(p, /(\d+\s+mAh\s+battery)/i) },
+                { label: 'Tela', val: p => extrair(p, /(\d+\.?\d*[″"]\s+display)/i) },
+                { label: 'Armazenamento', val: p => extrair(p, /(\d+\s+GB\s+storage)/i) }
             ];
 
             body.innerHTML = rows.map((row, i) => `
