@@ -128,14 +128,14 @@
 
         function buscar(index, query) {
             const resDiv = document.getElementById(`result-${index}`);
-            const queryUpper = query.toUpperCase();
             
-            // Busca à prova de falhas: verifica se os campos existem antes de pesquisar
+            // Divide a busca em palavras separadas (ex: "samsung s23" vira ["SAMSUNG", "S23"])
+            const termosBusca = query.toUpperCase().trim().split(/\s+/);
+            
+            // Busca Inteligente: Exige que todas as palavras digitadas estejam no nome
             const resultados = phoneDatabase.filter(d => {
-                const nome = (d.name || d.model_name || '').toUpperCase();
-                const marca = (d.brand || '').toUpperCase();
-                const nomeCompleto = `${marca} ${nome}`;
-                return nomeCompleto.includes(queryUpper) || nome.includes(queryUpper);
+                const textoAparelho = `${d.brand || ''} ${d.name || ''} ${d.model_name || ''}`.toUpperCase();
+                return termosBusca.every(termo => textoAparelho.includes(termo));
             });
 
             resDiv.innerHTML = '';
