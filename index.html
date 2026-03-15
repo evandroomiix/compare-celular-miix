@@ -20,7 +20,6 @@
 </head>
 <body class="p-4 md:p-10">
 
-    <!-- Efeito Aurora -->
     <div class="aurora-bg">
         <div class="glow bg-emerald-500 w-[500px] h-[500px] -top-20 -left-20"></div>
         <div class="glow bg-teal-500 w-[400px] h-[400px] bottom-0 right-0"></div>
@@ -28,19 +27,18 @@
 
     <header class="max-w-7xl mx-auto text-center mb-10">
         <h1 class="text-4xl md:text-6xl font-extrabold bg-gradient-to-r from-emerald-400 to-teal-200 bg-clip-text text-transparent italic tracking-tighter uppercase">BATALHA DE SPECS</h1>
-        <p class="text-emerald-500/60 text-[10px] font-bold tracking-[0.4em] uppercase mt-2">O Comparador Mais Rápido do Brasil</p>
+        <p class="text-emerald-500/60 text-[10px] font-bold tracking-[0.4em] uppercase mt-2">O Comparador n.º 1 do Brasil</p>
     </header>
 
     <main class="max-w-7xl mx-auto">
         <div id="setupArea">
-            <!-- 4 COLUNAS FIXAS -->
             <div id="searchGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
                 <script>
                     for(let i=0; i<4; i++) {
                         document.write(`
                             <div class="slot glass p-6 rounded-[2.5rem] flex flex-col items-center gap-4 border-white/5 transition-all" id="slot-${i}">
                                 <span class="text-[9px] font-black text-emerald-500/40 uppercase tracking-widest uppercase">Aparelho 0${i+1}</span>
-                                <input type="text" placeholder="Qual celular?" 
+                                <input type="text" placeholder="Pesquisar celular..." 
                                        onchange="buscarNoSlot(${i}, this.value)"
                                        class="w-full bg-white/5 border border-white/10 rounded-full px-5 py-3 text-[11px] outline-none focus:border-emerald-500 transition-all uppercase">
                                 <div id="result-${i}" class="w-full space-y-1 max-h-40 overflow-y-auto mt-2"></div>
@@ -57,7 +55,6 @@
             </div>
         </div>
 
-        <!-- RESULTADO DA BATALHA -->
         <div id="battleArea" class="hidden opacity-0 translate-y-10 transition-all duration-700">
             <div class="glass rounded-[3rem] overflow-hidden shadow-2xl">
                 <div class="overflow-x-auto">
@@ -78,16 +75,29 @@
         const HOST = 'phone-specs-explorer-api.p.rapidapi.com';
         const slotsData = [null, null, null, null];
 
+        // Função para extrair dados da "description" usando Inteligência de Texto (Regex)
+        function extrairDoTexto(texto, termo) {
+            if (!texto) return "N/A";
+            const regexes = {
+                display: /(\d+\.?\d*[″"]\s+display)/i,
+                chipset: /([\w\s-]+chipset)/i,
+                camera: /(\d+\s+MP\s+primary\s+camera)/i,
+                selfie: /(\d+\s+MP\s+front\s+camera)/i,
+                battery: /(\d+\s+mAh\s+battery)/i,
+                storage: /(\d+\s+GB\s+storage)/i,
+                ram: /(\d+\s+GB\s+RAM|\d+\s+MB\s+RAM)/i
+            };
+            const match = texto.match(regexes[termo]);
+            return match ? match[1].replace(/features/i, '').trim() : "Consulte Detalhes";
+        }
+
         async function buscarNoSlot(index, query) {
             if(!query) return;
             const resDiv = document.getElementById(`result-${index}`);
             resDiv.innerHTML = '<div class="flex justify-center py-4"><div class="loading-spin"></div></div>';
 
             try {
-                // Endpoint conforme o seu teste: /2165/search?q=
-                const url = `https://${HOST}/2165/search?q=${encodeURIComponent(query)}`;
-                
-                const response = await fetch(url, {
+                const response = await fetch(`https://${HOST}/2165/search?q=${encodeURIComponent(query)}`, {
                     method: 'GET',
                     headers: { 'X-RapidAPI-Key': API_KEY, 'X-RapidAPI-Host': HOST }
                 });
@@ -104,53 +114,71 @@
                 results.slice(0, 5).forEach(item => {
                     const btn = document.createElement('button');
                     btn.className = "w-full text-left p-3 rounded-2xl bg-white/5 text-[10px] font-semibold hover:bg-emerald-500 hover:text-black transition-all border border-white/5 mb-1 truncate uppercase";
-                    btn.innerText = item.phone_model; // Usando campo phone_model do seu JSON
-                    btn.onclick = () => selecionarParaSlot(index, item.id, item.phone_model, item.image_url);
+                    btn.innerText = item.phone_model;
+                    btn.onclick = () => selecionarParaSlot(index, item);
                     resDiv.appendChild(btn);
                 });
             } catch (err) {
-                resDiv.innerHTML = `<p class="text-[9px] text-red-400 text-center">Erro na conexão.</p>`;
+                resDiv.innerHTML = `<p class="text-[9px] text-red-400 text-center">Falha de conexão.</p>`;
             }
         }
 
-        async function selecionarParaSlot(index, phoneId, name, imageUrl) {
+        async function selecionarParaSlot(index, item) {
             const slotEl = document.getElementById(`slot-${index}`);
-            const resDiv = document.getElementById(`result-${index}`);
-            resDiv.innerHTML = '<div class="flex justify-center py-4"><div class="loading-spin"></div></div>';
+            
+            // Tentamos buscar specs detalhadas, mas já preparamos o "Plano B" com os dados que temos
+            let specsFinais = {
+                brand: item.brand_name,
+                phone_name: item.phone_model,
+                description: item.description,
+                image_url: item.image_url,
+                // Plano B (Extraído do texto caso o 404 ocorra)
+                ext_display: extrairDoTexto(item.description, 'display'),
+                ext_chipset: extrairDoTexto(item.description, 'chipset'),
+                ext_camera: extrairDoTexto(item.description, 'camera'),
+                ext_selfie: extrairDoTexto(item.description, 'selfie'),
+                ext_battery: extrairDoTexto(item.description, 'battery'),
+                ext_ram: extrairDoTexto(item.description, 'ram'),
+                ext_storage: extrairDoTexto(item.description, 'storage')
+            };
 
             try {
-                // Endpoint de detalhes: /2165/specifications
-                const url = `https://${HOST}/2165/specifications?id=${phoneId}`;
-                const res = await fetch(url, {
+                // Tenta buscar o detalhamento completo (Mesmo que dê 404, o código continuará)
+                const res = await fetch(`https://${HOST}/2165/specifications?id=${item.id}`, {
                     method: 'GET',
                     headers: { 'X-RapidAPI-Key': API_KEY, 'X-RapidAPI-Host': HOST }
                 });
-                const details = await res.json();
-                
-                // Salvamos os dados
-                slotsData[index] = details.data || details;
-                
-                slotEl.classList.add('slot-confirmed');
-                slotEl.innerHTML = `
-                    <img src="${imageUrl || 'https://via.placeholder.com/100x150?text=No+Img'}" class="h-24 object-contain mb-2 drop-shadow-lg">
-                    <p class="text-[11px] font-bold text-center leading-tight uppercase italic">${name}</p>
-                    <button onclick="location.reload()" class="mt-4 text-[9px] font-bold text-white/30 hover:text-red-400 uppercase tracking-widest">Trocar</button>
-                `;
-                
-                const ativos = slotsData.filter(s => s !== null).length;
-                document.getElementById('battleBtn').disabled = ativos < 2;
-            } catch(e) {
-                resDiv.innerHTML = `<p class="text-[9px] text-red-400 text-center">Erro ao carregar specs.</p>`;
-            }
+                if(res.ok) {
+                    const fullData = await res.json();
+                    specsFinais.fullSpecs = fullData.data || fullData;
+                }
+            } catch(e) { console.log("Usando dados do Plano B"); }
+
+            slotsData[index] = specsFinais;
+            
+            slotEl.classList.add('slot-confirmed');
+            slotEl.innerHTML = `
+                <img src="${item.image_url || 'https://via.placeholder.com/100x150?text=Sem+Foto'}" class="h-24 object-contain mb-2 drop-shadow-xl">
+                <p class="text-[11px] font-bold text-center leading-tight uppercase italic">${item.phone_model}</p>
+                <button onclick="location.reload()" class="mt-4 text-[9px] font-bold text-white/30 hover:text-red-400 uppercase tracking-widest">Trocar</button>
+            `;
+            
+            const ativos = slotsData.filter(s => s !== null).length;
+            document.getElementById('battleBtn').disabled = ativos < 2;
         }
 
-        // Função para limpar e traduzir as especificações
-        function getSpec(device, categoryName, keyName) {
-            if (!device || !device.specifications) return "N/A";
-            const cat = device.specifications.find(c => c.title.toLowerCase().includes(categoryName.toLowerCase()));
-            if (!cat) return "N/A";
-            const item = cat.specs.find(s => s.key.toLowerCase().includes(keyName.toLowerCase()));
-            return item ? item.val[0] : "N/A";
+        // Função para ler dados ou das Specs Full ou do nosso Plano B
+        function getSpec(p, category, key, backupKey) {
+            // Se tivermos as especificações completas da API, usamos elas
+            if (p.fullSpecs && p.fullSpecs.specifications) {
+                const cat = p.fullSpecs.specifications.find(c => c.title.toLowerCase().includes(category.toLowerCase()));
+                if (cat) {
+                    const item = cat.specs.find(s => s.key.toLowerCase().includes(key.toLowerCase()));
+                    if (item) return item.val[0];
+                }
+            }
+            // Caso contrário, usa o dado extraído do texto da descrição
+            return p[backupKey] || "N/A";
         }
 
         function iniciarBatalha() {
@@ -169,22 +197,21 @@
                     ${selecionados.map(p => `
                         <th class="p-6 text-center border-l border-white/5">
                             <span class="block text-emerald-400 text-[9px] font-bold uppercase mb-1">${p.brand || ''}</span>
-                            <span class="font-black text-sm uppercase leading-none">${p.phone_name || 'Aparelho'}</span>
+                            <span class="font-black text-sm uppercase leading-none">${p.phone_name}</span>
                         </th>
                     `).join('')}
                 </tr>
             `;
 
             const rows = [
-                { label: 'Processador (CPU)', val: p => getSpec(p, 'Platform', 'CPU') },
-                { label: 'Chipset', val: p => getSpec(p, 'Platform', 'Chipset') },
-                { label: 'Memória RAM', val: p => getSpec(p, 'Memory', 'Internal') },
-                { label: 'Câmera Principal', val: p => getSpec(p, 'Main Camera', 'Single') || getSpec(p, 'Main Camera', 'Triple') || getSpec(p, 'Main Camera', 'Quad') },
-                { label: 'Bateria', val: p => getSpec(p, 'Battery', 'Type') },
-                { label: 'Carregamento', val: p => getSpec(p, 'Battery', 'Charging') },
-                { label: 'Tela', val: p => getSpec(p, 'Display', 'Type') },
-                { label: 'Resolução', val: p => getSpec(p, 'Display', 'Resolution') },
-                { label: 'Lançamento', val: p => p.release_date || getSpec(p, 'Launch', 'Announced') }
+                { label: 'Processador / Chipset', val: p => getSpec(p, 'Platform', 'Chipset', 'ext_chipset') },
+                { label: 'Memória RAM', val: p => getSpec(p, 'Memory', 'Internal', 'ext_ram') },
+                { label: 'Armazenamento', val: p => getSpec(p, 'Memory', 'Internal', 'ext_storage') },
+                { label: 'Câmera Principal', val: p => getSpec(p, 'Main Camera', 'Single', 'ext_camera') },
+                { label: 'Câmera Frontal', val: p => getSpec(p, 'Selfie camera', 'Single', 'ext_selfie') },
+                { label: 'Bateria', val: p => getSpec(p, 'Battery', 'Type', 'ext_battery') },
+                { label: 'Tela', val: p => getSpec(p, 'Display', 'Size', 'ext_display') },
+                { label: 'Resumo', val: p => p.description.split('.')[1] + '.' || 'N/A' }
             ];
 
             body.innerHTML = rows.map((row, i) => `
