@@ -86,7 +86,7 @@
         
         // SUA CHAVE DA API E O ID DO DATASET
         const APIFY_TOKEN = 'apify_api_bs5O1ysnZJsu4tUmr8UvSMej3I4cmU3qB7yL';
-        const DATASET_ID = '3tmXzuwcfKbhx9wWn'; // Seu Dataset ID real da Apify
+        const DATASET_ID = 'qERmL2zxiGdBSEXWG'; // Seu Dataset ID real da Apify
 
         async function carregarBancoDeDados() {
             // Muda o texto dos campos enquanto baixa o arquivo do Apify
@@ -96,7 +96,8 @@
             }
 
             try {
-                const response = await fetch(`https://api.apify.com/v2/datasets/${DATASET_ID}/items?token=${APIFY_TOKEN}`);
+                // Adicionado &format=json&clean=true para forçar a formatação correta dos dados
+                const response = await fetch(`https://api.apify.com/v2/datasets/${DATASET_ID}/items?token=${APIFY_TOKEN}&format=json&clean=true`);
                 
                 // Verifica se a API recusou a conexão (Token inválido, Dataset inexistente, etc)
                 if (!response.ok) {
