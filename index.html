@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Batalha de Specs - Oficial</title>
+    <title>Batalha de Specs - O Comparador n.º 1</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
@@ -16,6 +16,7 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-thumb { background: #10b981; border-radius: 10px; }
+        .dropdown-results { max-height: 250px; overflow-y: auto; z-index: 50; }
     </style>
 </head>
 <body class="p-4 md:p-10">
@@ -27,21 +28,22 @@
 
     <header class="max-w-7xl mx-auto text-center mb-10">
         <h1 class="text-4xl md:text-6xl font-extrabold bg-gradient-to-r from-emerald-400 to-teal-200 bg-clip-text text-transparent italic tracking-tighter uppercase">BATALHA DE SPECS</h1>
-        <p class="text-emerald-500/60 text-[10px] font-bold tracking-[0.4em] uppercase mt-2">O Comparador n.º 1 do Brasil</p>
+        <p class="text-emerald-500/60 text-[10px] font-bold tracking-[0.4em] uppercase mt-2">Tecnologia, Comparação e Preços</p>
     </header>
 
     <main class="max-w-7xl mx-auto">
         <div id="setupArea">
+            <!-- 4 COLUNAS DE BUSCA INSTANTÂNEA -->
             <div id="searchGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
                 <script>
                     for(let i=0; i<4; i++) {
                         document.write(`
-                            <div class="slot glass p-6 rounded-[2.5rem] flex flex-col items-center gap-4 border-white/5 transition-all" id="slot-${i}">
-                                <span class="text-[9px] font-black text-emerald-500/40 uppercase tracking-widest uppercase">Aparelho 0${i+1}</span>
-                                <input type="text" placeholder="Pesquisar celular..." 
-                                       onchange="buscarNoSlot(${i}, this.value)"
+                            <div class="slot glass p-6 rounded-[2.5rem] flex flex-col items-center gap-4 border-white/5 transition-all relative" id="slot-${i}">
+                                <span class="text-[9px] font-black text-emerald-500/40 uppercase tracking-widest">Aparelho 0${i+1}</span>
+                                <input type="text" placeholder="Digite para buscar..." 
+                                       oninput="debounceSearch(${i}, this.value)"
                                        class="w-full bg-white/5 border border-white/10 rounded-full px-5 py-3 text-[11px] outline-none focus:border-emerald-500 transition-all uppercase">
-                                <div id="result-${i}" class="w-full space-y-1 max-h-40 overflow-y-auto mt-2"></div>
+                                <div id="result-${i}" class="dropdown-results w-full space-y-1 mt-2"></div>
                             </div>
                         `);
                     }
@@ -55,6 +57,7 @@
             </div>
         </div>
 
+        <!-- RESULTADO -->
         <div id="battleArea" class="hidden opacity-0 translate-y-10 transition-all duration-700">
             <div class="glass rounded-[3rem] overflow-hidden shadow-2xl">
                 <div class="overflow-x-auto">
@@ -74,25 +77,19 @@
         const API_KEY = '0adddb24fbmsh2289164deba91c5p1ff721jsn0d25d66220ff'.trim();
         const HOST = 'phone-specs-explorer-api.p.rapidapi.com';
         const slotsData = [null, null, null, null];
+        let timers = [null, null, null, null];
 
-        // Função para extrair dados da "description" usando Inteligência de Texto (Regex)
-        function extrairDoTexto(texto, termo) {
-            if (!texto) return "N/A";
-            const regexes = {
-                display: /(\d+\.?\d*[″"]\s+display)/i,
-                chipset: /([\w\s-]+chipset)/i,
-                camera: /(\d+\s+MP\s+primary\s+camera)/i,
-                selfie: /(\d+\s+MP\s+front\s+camera)/i,
-                battery: /(\d+\s+mAh\s+battery)/i,
-                storage: /(\d+\s+GB\s+storage)/i,
-                ram: /(\d+\s+GB\s+RAM|\d+\s+MB\s+RAM)/i
-            };
-            const match = texto.match(regexes[termo]);
-            return match ? match[1].replace(/features/i, '').trim() : "Consulte Detalhes";
+        // Função para não estourar a API (espera o usuário parar de digitar)
+        function debounceSearch(index, query) {
+            clearTimeout(timers[index]);
+            if (query.length < 2) {
+                document.getElementById(`result-${index}`).innerHTML = '';
+                return;
+            }
+            timers[index] = setTimeout(() => buscarNoSlot(index, query), 500);
         }
 
         async function buscarNoSlot(index, query) {
-            if(!query) return;
             const resDiv = document.getElementById(`result-${index}`);
             resDiv.innerHTML = '<div class="flex justify-center py-4"><div class="loading-spin"></div></div>';
 
@@ -101,49 +98,32 @@
                     method: 'GET',
                     headers: { 'X-RapidAPI-Key': API_KEY, 'X-RapidAPI-Host': HOST }
                 });
-                
                 const responseData = await response.json();
                 const results = responseData.data || [];
 
                 resDiv.innerHTML = '';
-                if(results.length === 0) {
-                    resDiv.innerHTML = '<p class="text-[9px] text-center opacity-40">Nenhum resultado.</p>';
-                    return;
-                }
-
-                results.slice(0, 5).forEach(item => {
+                results.slice(0, 6).forEach(item => {
                     const btn = document.createElement('button');
-                    btn.className = "w-full text-left p-3 rounded-2xl bg-white/5 text-[10px] font-semibold hover:bg-emerald-500 hover:text-black transition-all border border-white/5 mb-1 truncate uppercase";
-                    btn.innerText = item.phone_model;
+                    btn.className = "w-full text-left p-3 rounded-2xl bg-white/5 text-[10px] font-semibold hover:bg-emerald-500 hover:text-black transition-all border border-white/5 mb-1 truncate uppercase flex items-center gap-2";
+                    btn.innerHTML = `<span class="opacity-30">#</span> ${item.phone_model}`;
                     btn.onclick = () => selecionarParaSlot(index, item);
                     resDiv.appendChild(btn);
                 });
-            } catch (err) {
-                resDiv.innerHTML = `<p class="text-[9px] text-red-400 text-center">Falha de conexão.</p>`;
-            }
+            } catch (err) { console.error(err); }
         }
 
         async function selecionarParaSlot(index, item) {
             const slotEl = document.getElementById(`slot-${index}`);
-            
-            // Tentamos buscar specs detalhadas, mas já preparamos o "Plano B" com os dados que temos
-            let specsFinais = {
+            const specsFinais = {
                 brand: item.brand_name,
                 phone_name: item.phone_model,
                 description: item.description,
                 image_url: item.image_url,
-                // Plano B (Extraído do texto caso o 404 ocorra)
-                ext_display: extrairDoTexto(item.description, 'display'),
-                ext_chipset: extrairDoTexto(item.description, 'chipset'),
-                ext_camera: extrairDoTexto(item.description, 'camera'),
-                ext_selfie: extrairDoTexto(item.description, 'selfie'),
-                ext_battery: extrairDoTexto(item.description, 'battery'),
-                ext_ram: extrairDoTexto(item.description, 'ram'),
-                ext_storage: extrairDoTexto(item.description, 'storage')
+                id: item.id
             };
 
+            // Tentativa de buscar specs full (mesmo que dê 404, usamos o fallback da descrição)
             try {
-                // Tenta buscar o detalhamento completo (Mesmo que dê 404, o código continuará)
                 const res = await fetch(`https://${HOST}/2165/specifications?id=${item.id}`, {
                     method: 'GET',
                     headers: { 'X-RapidAPI-Key': API_KEY, 'X-RapidAPI-Host': HOST }
@@ -152,66 +132,48 @@
                     const fullData = await res.json();
                     specsFinais.fullSpecs = fullData.data || fullData;
                 }
-            } catch(e) { console.log("Usando dados do Plano B"); }
+            } catch(e) {}
 
             slotsData[index] = specsFinais;
-            
             slotEl.classList.add('slot-confirmed');
             slotEl.innerHTML = `
-                <img src="${item.image_url || 'https://via.placeholder.com/100x150?text=Sem+Foto'}" class="h-24 object-contain mb-2 drop-shadow-xl">
-                <p class="text-[11px] font-bold text-center leading-tight uppercase italic">${item.phone_model}</p>
-                <button onclick="location.reload()" class="mt-4 text-[9px] font-bold text-white/30 hover:text-red-400 uppercase tracking-widest">Trocar</button>
+                <img src="${item.image_url || 'https://via.placeholder.com/100x150?text=Sem+Foto'}" class="h-28 object-contain mb-2 drop-shadow-2xl">
+                <p class="text-[11px] font-bold text-center uppercase italic">${item.phone_model}</p>
+                <button onclick="location.reload()" class="mt-2 text-[8px] font-bold text-red-400 uppercase tracking-widest">Remover</button>
             `;
-            
-            const ativos = slotsData.filter(s => s !== null).length;
-            document.getElementById('battleBtn').disabled = ativos < 2;
+            document.getElementById('battleBtn').disabled = slotsData.filter(s => s !== null).length < 2;
         }
 
-        // Função para ler dados ou das Specs Full ou do nosso Plano B
-        function getSpec(p, category, key, backupKey) {
-            // Se tivermos as especificações completas da API, usamos elas
-            if (p.fullSpecs && p.fullSpecs.specifications) {
-                const cat = p.fullSpecs.specifications.find(c => c.title.toLowerCase().includes(category.toLowerCase()));
-                if (cat) {
-                    const item = cat.specs.find(s => s.key.toLowerCase().includes(key.toLowerCase()));
-                    if (item) return item.val[0];
-                }
-            }
-            // Caso contrário, usa o dado extraído do texto da descrição
-            return p[backupKey] || "N/A";
+        function extrair(p, regex, label) {
+            const match = p.description.match(regex);
+            return match ? match[1] : "Consulte Loja";
         }
 
         function iniciarBatalha() {
-            const selecionados = slotsData.filter(s => s !== null);
             document.getElementById('setupArea').classList.add('hidden');
             const area = document.getElementById('battleArea');
             area.classList.remove('hidden');
             setTimeout(() => { area.style.opacity = "1"; area.style.transform = "translateY(0)"; }, 100);
 
+            const selecionados = slotsData.filter(s => s !== null);
             const head = document.getElementById('tableHead');
             const body = document.getElementById('tableBody');
 
             head.innerHTML = `
                 <tr>
-                    <th class="p-6 text-emerald-400 text-[10px] font-black uppercase tracking-[0.2em] italic">Atributo</th>
-                    ${selecionados.map(p => `
-                        <th class="p-6 text-center border-l border-white/5">
-                            <span class="block text-emerald-400 text-[9px] font-bold uppercase mb-1">${p.brand || ''}</span>
-                            <span class="font-black text-sm uppercase leading-none">${p.phone_name}</span>
-                        </th>
-                    `).join('')}
+                    <th class="p-6 text-emerald-400 text-[10px] font-black italic tracking-widest uppercase">Atributo</th>
+                    ${selecionados.map(p => `<th class="p-6 text-center border-l border-white/5 font-black text-sm uppercase">${p.phone_name}</th>`).join('')}
                 </tr>
             `;
 
             const rows = [
-                { label: 'Processador / Chipset', val: p => getSpec(p, 'Platform', 'Chipset', 'ext_chipset') },
-                { label: 'Memória RAM', val: p => getSpec(p, 'Memory', 'Internal', 'ext_ram') },
-                { label: 'Armazenamento', val: p => getSpec(p, 'Memory', 'Internal', 'ext_storage') },
-                { label: 'Câmera Principal', val: p => getSpec(p, 'Main Camera', 'Single', 'ext_camera') },
-                { label: 'Câmera Frontal', val: p => getSpec(p, 'Selfie camera', 'Single', 'ext_selfie') },
-                { label: 'Bateria', val: p => getSpec(p, 'Battery', 'Type', 'ext_battery') },
-                { label: 'Tela', val: p => getSpec(p, 'Display', 'Size', 'ext_display') },
-                { label: 'Resumo', val: p => p.description.split('.')[1] + '.' || 'N/A' }
+                { label: 'Preço Médio (Est.)', val: p => extrair(p, /(\$\s?\d+)/, 'Preço') || "Consultar Varejo" },
+                { label: 'Processador', val: p => extrair(p, /([\w\s-]+chipset)/i, 'CPU') },
+                { label: 'Memória RAM', val: p => extrair(p, /(\d+\s+(?:GB|MB)\s+RAM)/i, 'RAM') },
+                { label: 'Câmera Principal', val: p => extrair(p, /(\d+\s+MP\s+primary)/i, 'Cam') },
+                { label: 'Bateria', val: p => extrair(p, /(\d+\s+mAh\s+battery)/i, 'Bat') },
+                { label: 'Tela', val: p => extrair(p, /(\d+\.?\d*[″"]\s+display)/i, 'Tela') },
+                { label: 'Armazenamento', val: p => extrair(p, /(\d+\s+GB\s+storage)/i, 'HD') }
             ];
 
             body.innerHTML = rows.map((row, i) => `
