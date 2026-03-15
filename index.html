@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Batalha Tech - Comparador de Elite</title>
+    <title>Batalha Tech - O Comparador Oficial</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
@@ -11,16 +11,15 @@
         .aurora-bg { position: fixed; inset: 0; z-index: -1; }
         .glow { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.15; }
         .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .slot-confirmed { border-color: #10b981 !important; background: rgba(16, 185, 129, 0.1) !important; box-shadow: 0 0 20px rgba(16, 185, 129, 0.2); }
         
-        /* Estilo da Tabela Profissional */
-        .table-container { border-radius: 2rem; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.1); }
-        .spec-label { position: sticky; left: 0; background: #011a14; z-index: 10; min-width: 140px; font-weight: 800; color: #10b981; font-size: 10px; text-transform: uppercase; }
-        .device-col { min-width: 200px; text-align: center; border-left: 1px solid rgba(255, 255, 255, 0.05); }
+        /* Tabela Profissional com Lateral Fixa */
+        .spec-label { position: sticky; left: 0; background: #011a14; z-index: 10; min-width: 130px; font-weight: 800; color: #10b981; font-size: 9px; text-transform: uppercase; border-right: 1px solid rgba(255, 255, 255, 0.1); }
+        .device-col { min-width: 180px; text-align: center; border-left: 1px solid rgba(255, 255, 255, 0.05); }
         
         ::-webkit-scrollbar { height: 6px; width: 6px; }
         ::-webkit-scrollbar-thumb { background: #10b981; border-radius: 10px; }
-        .loading-spin { border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid #10b981; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        .tag-rumor { background: #f59e0b; color: black; font-size: 7px; padding: 2px 4px; border-radius: 3px; font-weight: 900; margin-left: 5px; }
     </style>
 </head>
 <body class="p-4 md:p-10">
@@ -30,22 +29,21 @@
         <div class="glow bg-teal-500 w-[500px] h-[500px] bottom-0 right-0"></div>
     </div>
 
-    <header class="max-w-7xl mx-auto text-center mb-12">
+    <header class="max-w-7xl mx-auto text-center mb-10">
         <h1 class="text-5xl md:text-7xl font-extrabold bg-gradient-to-r from-emerald-400 to-teal-200 bg-clip-text text-transparent italic tracking-tighter uppercase">BATALHA TECH</h1>
-        <p id="statusInfo" class="text-emerald-500/60 text-[10px] font-bold tracking-[0.4em] uppercase mt-2">Carregando banco de dados Apify...</p>
+        <p class="text-emerald-500/60 text-[10px] font-bold tracking-[0.3em] uppercase mt-2">Dados Premium + Rumores S25 e S26</p>
     </header>
 
     <main class="max-w-7xl mx-auto">
         <div id="setupArea">
-            <!-- 4 SLOTS DE BUSCA -->
             <div id="searchGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
                 <script>
                     for(let i=0; i<4; i++) {
                         document.write(`
-                            <div class="slot glass p-6 rounded-[2.5rem] flex flex-col items-center gap-4 transition-all relative" id="slot-${i}">
-                                <span class="text-[9px] font-black text-emerald-500/40 uppercase tracking-widest uppercase">Slot ${i+1}</span>
-                                <input type="text" placeholder="Buscar celular..." 
-                                       oninput="filtrarAparelhos(${i}, this.value)"
+                            <div class="slot glass p-6 rounded-[2.5rem] flex flex-col items-center gap-4 border-white/5 transition-all relative" id="slot-${i}">
+                                <span class="text-[9px] font-black text-emerald-500/40 uppercase tracking-widest">Aparelho 0${i+1}</span>
+                                <input type="text" placeholder="Busque S24, iPhone, S25..." 
+                                       oninput="buscarAparelhos(${i}, this.value)"
                                        class="w-full bg-white/5 border border-white/10 rounded-full px-5 py-3 text-[11px] outline-none focus:border-emerald-500 transition-all uppercase">
                                 <div id="result-${i}" class="w-full space-y-1 mt-2 max-h-48 overflow-y-auto"></div>
                             </div>
@@ -61,54 +59,60 @@
             </div>
         </div>
 
-        <!-- AREA DA TABELA (RESULTADO) -->
+        <!-- RESULTADO -->
         <div id="battleArea" class="hidden opacity-0 translate-y-10 transition-all duration-700">
-            <div class="table-container glass shadow-2xl overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead id="tableHead"></thead>
-                    <tbody id="tableBody"></tbody>
-                </table>
+            <div class="glass rounded-[3rem] overflow-hidden shadow-2xl">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead id="tableHead"></thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                </div>
             </div>
             <div class="text-center mt-12 pb-20">
-                <button onclick="location.reload()" class="bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 px-10 py-4 rounded-full text-xs font-bold uppercase hover:bg-emerald-500 hover:text-black transition-all">Nova Comparação</button>
+                <button onclick="location.reload()" class="bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 px-10 py-4 rounded-full text-xs font-bold uppercase hover:bg-emerald-500 hover:text-black transition-all">Nova Batalha</button>
             </div>
         </div>
     </main>
 
     <script>
-        // LINK DO SEU DATASET DO APIFY
-        const DATASET_URL = 'https://api.apify.com/v2/datasets/2GJiVu6yOOFt35478/items?token=apify_api_bs5O1ysnZJsu4tUmr8UvSMej3I4cmU3qB7yL';
-        
-        let database = [];
+        // BANCO LOCAL DE CELULARES (Sempre disponível)
+        const dbLocal = [
+            { phone_model: "Galaxy S24 Ultra", brand_name: "Samsung", price: "R$ 6.900", cpu: "Snapdragon 8 Gen 3", ram: "12GB RAM", battery: "5000 mAh", display_size: "6.8\"", camera_main: "200MP", image_url: "https://images.samsung.com/is/image/samsung/p6pim/br/2401/gallery/br-galaxy-s24-s928-sm-s928bztqzto-539358253" },
+            { phone_model: "Galaxy S25 Ultra", brand_name: "Samsung", rumor: true, price: "Rumor", cpu: "Snapdragon 8 Gen 4", ram: "16GB RAM", battery: "5500 mAh", display_size: "6.9\"", camera_main: "200MP (Novo)", image_url: "https://cdn.dooca.store/107/products/s24-ultra-titanium-gray-01_1000x1000+fill_ffffff.png" },
+            { phone_model: "iPhone 16 Pro Max", brand_name: "Apple", price: "R$ 9.500", cpu: "A18 Pro", ram: "8GB RAM", battery: "4676 mAh", display_size: "6.9\"", camera_main: "48MP + 48MP", image_url: "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-9inch-naturaltitanium?wid=5120&hei=2880&fmt=p-jpg" },
+            { phone_model: "iPhone 15 Pro Max", brand_name: "Apple", price: "R$ 7.200", cpu: "A17 Pro", ram: "8GB RAM", battery: "4441 mAh", display_size: "6.7\"", camera_main: "48MP + 12MP", image_url: "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-15-pro-finish-select-202309-6-7inch-naturaltitanium?wid=5120&hei=2880&fmt=p-jpg" },
+            { phone_model: "Galaxy S25 FE", brand_name: "Samsung", rumor: true, price: "Rumor", cpu: "Exynos 2500", ram: "8GB RAM", battery: "4800 mAh", display_size: "6.7\"", camera_main: "50MP", image_url: "" },
+            { phone_model: "Galaxy S26 Ultra", brand_name: "Samsung", rumor: true, price: "Rumor 2026", cpu: "Snapdragon 8 Gen 5", ram: "24GB RAM", battery: "6000 mAh", display_size: "7.0\"", camera_main: "300MP", image_url: "" }
+        ];
+
+        let dbApify = [];
         const selecionados = [null, null, null, null];
 
-        // Carregar dados na abertura do site
+        // Carrega o seu Dataset do Apify em segundo plano
         window.onload = async () => {
             try {
-                const response = await fetch(DATASET_URL);
-                database = await response.json();
-                document.getElementById('statusInfo').innerText = `${database.length} APARELHOS SINCRONIZADOS COM APIFY`;
-            } catch (e) {
-                document.getElementById('statusInfo').innerText = "ERRO AO SINCRONIZAR. VERIFIQUE SEU TOKEN.";
-            }
+                const res = await fetch('https://api.apify.com/v2/datasets/2GJiVu6yOOFt35478/items?token=apify_api_bs5O1ysnZJsu4tUmr8UvSMej3I4cmU3qB7yL');
+                dbApify = await res.json();
+            } catch (e) { console.log("Apify offline, usando banco local."); }
         };
 
-        function filtrarAparelhos(index, query) {
+        function buscarAparelhos(index, query) {
             const resDiv = document.getElementById(`result-${index}`);
-            if (query.length < 2) { resDiv.innerHTML = ''; return; }
+            if (query.length < 1) { resDiv.innerHTML = ''; return; }
 
             const busca = query.toLowerCase();
-            const filtrados = database.filter(d => 
-                (d.phone_model || d.name || "").toLowerCase().includes(busca) || 
-                (d.brand_name || d.brand || "").toLowerCase().includes(busca)
+            // Une os dois bancos para a pesquisa
+            const tudo = [...dbLocal, ...dbApify];
+            const filtrados = tudo.filter(d => 
+                (d.phone_model || d.name || "").toLowerCase().includes(busca)
             );
 
             resDiv.innerHTML = '';
             filtrados.slice(0, 10).forEach(item => {
-                const name = item.phone_model || item.name || "Desconhecido";
                 const btn = document.createElement('button');
-                btn.className = "w-full text-left p-3 rounded-xl bg-white/5 text-[10px] font-semibold hover:bg-emerald-500 hover:text-black transition-all border border-white/5 mb-1 uppercase";
-                btn.innerText = name;
+                btn.className = "w-full text-left p-3 rounded-xl bg-white/5 text-[10px] font-semibold hover:bg-emerald-500 hover:text-black transition-all border border-white/5 mb-1 flex justify-between items-center uppercase";
+                btn.innerHTML = `<span>${item.phone_model || item.name}</span> ${item.rumor ? '<span class="tag-rumor">RUMOR</span>' : ''}`;
                 btn.onclick = () => fixarSlot(index, item);
                 resDiv.appendChild(btn);
             });
@@ -123,11 +127,11 @@
 
             slotEl.classList.add('slot-confirmed');
             slotEl.innerHTML = `
-                <div class="h-28 flex items-center justify-center mb-2">
-                    ${img ? `<img src="${img}" class="h-full object-contain drop-shadow-2xl">` : `<div class="text-4xl">📱</div>`}
+                <div class="h-24 flex items-center justify-center mb-2">
+                    ${img ? `<img src="${img}" class="h-full object-contain drop-shadow-2xl">` : `<div class="text-3xl">📱</div>`}
                 </div>
                 <p class="text-[10px] font-bold text-center uppercase italic leading-tight">${name}</p>
-                <button onclick="location.reload()" class="mt-4 text-[8px] font-bold text-red-500 uppercase tracking-widest">Remover</button>
+                <button onclick="location.reload()" class="mt-4 text-[8px] font-bold text-red-400 uppercase tracking-widest">Remover</button>
             `;
             
             const count = selecionados.filter(s => s !== null).length;
@@ -144,40 +148,34 @@
             const head = document.getElementById('tableHead');
             const body = document.getElementById('tableBody');
 
-            // CABEÇALHO (Imagens e Nomes)
             head.innerHTML = `
                 <tr class="bg-emerald-500/10">
                     <th class="p-6 spec-label border-b border-white/10">Especificação</th>
                     ${ativos.map(p => `
                         <th class="p-6 device-col border-b border-white/10">
                             <img src="${p.image_url || p.thumbnail || ''}" class="h-20 mx-auto mb-2 object-contain">
-                            <span class="block font-black text-sm uppercase leading-none text-emerald-400">${p.phone_model || p.name}</span>
+                            <span class="block font-black text-[11px] uppercase leading-none text-emerald-400">${p.phone_model || p.name}</span>
                         </th>
                     `).join('')}
                 </tr>
             `;
 
-            // MAPEAMENTO DE DADOS DO APIFY (Extrai as chaves comuns)
             const specs = [
+                { label: 'Preço Médio', key: 'price' },
                 { label: 'Processador', key: 'cpu' },
-                { label: 'Chipset', key: 'chipset' },
                 { label: 'Memória RAM', key: 'ram' },
                 { label: 'Bateria', key: 'battery' },
                 { label: 'Câmera Principal', key: 'camera_main' },
-                { label: 'Câmera Frontal', key: 'camera_selfie' },
                 { label: 'Display (Tela)', key: 'display_size' },
-                { label: 'Resolução', key: 'display_resolution' },
-                { label: 'Sistema (OS)', key: 'os' },
-                { label: 'Dimensões', key: 'dimensions' },
-                { label: 'Ano Lançamento', key: 'release_date' }
+                { label: 'Chipset', key: 'chipset' }
             ];
 
-            body.innerHTML = specs.map((s, i) => `
+            body.innerHTML = specs.map(s => `
                 <tr class="border-b border-white/5 hover:bg-white/[0.02]">
-                    <td class="p-4 spec-label border-r border-white/5">${s.label}</td>
+                    <td class="p-4 spec-label">${s.label}</td>
                     ${ativos.map(p => `
                         <td class="p-4 device-col text-[11px] font-medium text-white/80">
-                            ${p[s.key] || p.specifications?.find(cat => cat.title === s.label)?.specs?.[0]?.val?.[0] || 'N/D'}
+                            ${p[s.key] || 'Consultar'}
                         </td>
                     `).join('')}
                 </tr>
