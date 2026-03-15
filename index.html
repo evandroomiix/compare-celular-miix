@@ -14,9 +14,9 @@
         .slot-confirmed { border-color: #10b981 !important; background: rgba(16, 185, 129, 0.1) !important; box-shadow: 0 0 20px rgba(16, 185, 129, 0.2); }
         
         /* Tabela Pro com Sidebar Fixa */
-        .spec-sidebar { position: sticky; left: 0; background: #011511; z-index: 30; min-width: 140px; font-weight: 800; color: #10b981; font-size: 9px; text-transform: uppercase; border-right: 1px solid rgba(255, 255, 255, 0.1); padding: 15px !important; }
-        .device-col { min-width: 200px; text-align: center; border-left: 1px solid rgba(255, 255, 255, 0.05); padding: 15px !important; }
-        .cat-header { background: rgba(16, 185, 129, 0.1); color: #10b981; font-weight: 900; font-size: 10px; letter-spacing: 2px; text-align: center; }
+        .spec-sidebar { position: sticky; left: 0; background: #011511; z-index: 30; min-width: 140px; max-width: 180px; font-weight: 800; color: #10b981; font-size: 11px; text-transform: uppercase; border-right: 1px solid rgba(255, 255, 255, 0.1); padding: 15px !important; }
+        .device-col { min-width: 200px; text-align: center; border-left: 1px solid rgba(255, 255, 255, 0.05); padding: 15px !important; vertical-align: middle; }
+        .cat-header { background: rgba(16, 185, 129, 0.15); color: #10b981; font-weight: 900; font-size: 12px; letter-spacing: 2px; text-align: left; padding-left: 20px !important; }
         
         ::-webkit-scrollbar { height: 8px; width: 8px; }
         ::-webkit-scrollbar-thumb { background: #10b981; border-radius: 10px; }
@@ -73,8 +73,9 @@
                     </table>
                 </div>
             </div>
-            <div class="text-center mt-12 pb-20">
-                <button onclick="location.reload()" class="bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 px-10 py-4 rounded-full text-xs font-bold uppercase hover:bg-emerald-500 hover:text-black transition-all">Nova Batalha</button>
+            <div class="text-center mt-12 pb-20 flex justify-center gap-4 flex-wrap">
+                <button onclick="voltar()" class="bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 px-10 py-4 rounded-full text-xs font-bold uppercase hover:bg-emerald-500 hover:text-black transition-all">Voltar e Editar</button>
+                <button onclick="location.reload()" class="bg-red-500/10 border border-red-500/20 text-red-500 px-10 py-4 rounded-full text-xs font-bold uppercase hover:bg-red-500 hover:text-white transition-all">Limpar Tudo</button>
             </div>
         </div>
     </main>
@@ -162,9 +163,33 @@
             slotEl.innerHTML = `
                 <div class="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center mb-2"><svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7"></path></svg></div>
                 <p class="text-[10px] font-black text-center uppercase tracking-tighter">${item.name || item.device_name}</p>
-                <button onclick="location.reload()" class="mt-4 text-[8px] font-bold opacity-30 uppercase">Trocar</button>
+                <button onclick="remover(${index})" class="mt-4 text-[9px] font-bold text-red-400 opacity-60 hover:opacity-100 uppercase transition-all">Remover</button>
             `;
             document.getElementById('battleBtn').disabled = slotsData.filter(s => s !== null).length < 2;
+        }
+
+        function remover(index) {
+            slotsData[index] = null;
+            const slotEl = document.getElementById(`slot-${index}`);
+            slotEl.classList.remove('slot-confirmed');
+            slotEl.innerHTML = `
+                <span class="text-[9px] font-black text-emerald-500/40 uppercase tracking-widest">Aparelho 0${index+1}</span>
+                <input type="text" placeholder="Ex: S24 Ultra..." 
+                       oninput="debounceSearch(${index}, this.value)"
+                       class="w-full bg-white/5 border border-white/10 rounded-full px-5 py-3 text-[11px] outline-none focus:border-emerald-500 transition-all uppercase">
+                <div id="result-${index}" class="w-full space-y-1 mt-2 max-h-56 overflow-y-auto z-50"></div>
+            `;
+            document.getElementById('battleBtn').disabled = slotsData.filter(s => s !== null).length < 2;
+        }
+
+        function voltar() {
+            const area = document.getElementById('battleArea');
+            area.style.opacity = "0"; 
+            area.style.transform = "translateY(10px)";
+            setTimeout(() => { 
+                area.classList.add('hidden');
+                document.getElementById('setupArea').classList.remove('hidden');
+            }, 700);
         }
 
         function iniciarBatalha() {
@@ -185,24 +210,56 @@
             `;
 
             const rows = [
-                { cat: 'DESEMPENHO' },
-                { label: 'Processador', val: p => p.gsmPlatformDetails?.platformCpu || p.gsmPlatformDetails?.cpu },
-                { label: 'Chipset', val: p => p.gsmPlatformDetails?.platformChipset || p.gsmPlatformDetails?.chipset },
-                { label: 'Memória e RAM', val: p => p.gsmMemoryDetails?.memoryInternal || p.gsmMemoryDetails?.internal },
-                { cat: 'CÂMERAS' },
-                { label: 'Traseira', val: p => p.gsmMainCameraDetails?.mainCameraQuad || p.gsmMainCameraDetails?.mainCameraTriple || p.gsmMainCameraDetails?.main_camera_single },
-                { label: 'Selfie', val: p => p.gsmSelfieCameraDetails?.selfieCameraSingle || p.gsmSelfieCameraDetails?.camera_selfie },
-                { cat: 'BATERIA E TELA' },
-                { label: 'Bateria', val: p => p.gsmBatteryDetails?.batteryType || p.gsmBatteryDetails?.battery_type },
-                { label: 'Tela', val: p => p.gsmDisplayDetails?.displayType || p.gsmDisplayDetails?.display_type },
-                { label: 'Extras', val: p => p.gsmFeaturesDetails?.featuresOther1 || p.gsmFeaturesDetails?.featuresSensors || 'N/D' }
+                { cat: '📱 DESIGN E CORPO' },
+                { label: 'Dimensões', val: p => p.gsmBodyDetails?.bodyDimensions || p.bodyDimensions || '-' },
+                { label: 'Peso', val: p => p.gsmBodyDetails?.bodyWeight || p.bodyWeight || '-' },
+                { label: 'Construção', val: p => p.gsmBodyDetails?.bodyBuild || p.bodyBuild || '-' },
+                { label: 'Chips (SIM)', val: p => p.gsmBodyDetails?.bodySim || p.bodySim || '-' },
+                
+                { cat: '🖥️ TELA' },
+                { label: 'Tipo', val: p => p.gsmDisplayDetails?.displayType || p.displayType || p.screen || '-' },
+                { label: 'Tamanho', val: p => p.gsmDisplayDetails?.displaySize || p.displaySize || '-' },
+                { label: 'Resolução', val: p => p.gsmDisplayDetails?.displayResolution || p.displayResolution || '-' },
+                { label: 'Proteção', val: p => p.gsmDisplayDetails?.displayProtection || p.displayProtection || '-' },
+
+                { cat: '⚙️ PLATAFORMA (HARDWARE)' },
+                { label: 'Sistema (OS)', val: p => p.gsmPlatformDetails?.platformOs || p.platformOs || '-' },
+                { label: 'Processador (CPU)', val: p => p.gsmPlatformDetails?.platformCpu || p.cpu || '-' },
+                { label: 'Chipset', val: p => p.gsmPlatformDetails?.platformChipset || p.chipset || '-' },
+                { label: 'GPU', val: p => p.gsmPlatformDetails?.platformGpu || p.gpu || '-' },
+
+                { cat: '💾 MEMÓRIA' },
+                { label: 'Interna (RAM e ROM)', val: p => p.gsmMemoryDetails?.memoryInternal || p.ram || '-' },
+                { label: 'Cartão de Memória', val: p => p.gsmMemoryDetails?.memoryCardSlot || p.memoryCardSlot || '-' },
+
+                { cat: '📸 CÂMERA PRINCIPAL' },
+                { label: 'Sensores', val: p => p.gsmMainCameraDetails?.mainCameraQuad || p.gsmMainCameraDetails?.mainCameraTriple || p.gsmMainCameraDetails?.mainCameraDual || p.gsmMainCameraDetails?.mainCameraSingle || p.cam || '-' },
+                { label: 'Recursos', val: p => p.gsmMainCameraDetails?.mainCameraFeatures || '-' },
+                { label: 'Vídeo', val: p => p.gsmMainCameraDetails?.mainCameraVideo || '-' },
+
+                { cat: '🤳 CÂMERA FRONTAL' },
+                { label: 'Sensores', val: p => p.gsmSelfieCameraDetails?.selfieCameraSingle || p.gsmSelfieCameraDetails?.selfieCameraDual || '-' },
+                { label: 'Vídeo', val: p => p.gsmSelfieCameraDetails?.selfieCameraVideo || '-' },
+
+                { cat: '🔊 ÁUDIO E CONEXÕES' },
+                { label: 'Alto-falantes', val: p => p.gsmSoundDetails?.soundLoudspeaker || '-' },
+                { label: 'Wi-Fi', val: p => p.gsmCommsDetails?.commsWlan || '-' },
+                { label: 'Bluetooth', val: p => p.gsmCommsDetails?.commsBluetooth || '-' },
+                { label: 'GPS', val: p => p.gsmCommsDetails?.commsPositioning || p.gsmCommsDetails?.commsGps || '-' },
+                { label: 'NFC', val: p => p.gsmCommsDetails?.commsNfc || '-' },
+                { label: 'USB', val: p => p.gsmCommsDetails?.commsUsb || '-' },
+
+                { cat: '🔋 BATERIA E EXTRAS' },
+                { label: 'Sensores', val: p => p.gsmFeaturesDetails?.featuresSensors || p.sensor || '-' },
+                { label: 'Capacidade', val: p => p.gsmBatteryDetails?.batteryType || p.bat || '-' },
+                { label: 'Carregamento', val: p => p.gsmBatteryDetails?.batteryCharging || '-' }
             ];
 
             body.innerHTML = rows.map(r => {
-                if(r.cat) return `<tr class="cat-header"><td colspan="${ativos.length + 1}" class="p-3 uppercase tracking-widest">${r.cat}</td></tr>`;
-                return `<tr class="border-b border-white/5 hover:bg-white/[0.02]">
-                    <td class="p-4 spec-sidebar">${r.label}</td>
-                    ${ativos.map(p => `<td class="p-4 device-col text-[10px] text-white/80">${r.val(p) || 'Não informado'}</td>`).join('')}
+                if(r.cat) return `<tr class="cat-header"><td colspan="${ativos.length + 1}" class="p-3 uppercase tracking-widest text-emerald-300 font-extrabold bg-emerald-900/40">${r.cat}</td></tr>`;
+                return `<tr class="border-b border-white/5 hover:bg-white/[0.03] transition-colors">
+                    <td class="p-4 spec-sidebar text-white/60 font-bold">${r.label}</td>
+                    ${ativos.map(p => `<td class="p-4 device-col text-[11px] text-white/90 leading-relaxed">${r.val(p) || '-'}</td>`).join('')}
                 </tr>`;
             }).join('');
         }
