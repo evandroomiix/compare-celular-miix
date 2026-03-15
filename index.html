@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Batalha Tech - O Melhor Comparador</title>
+    <title>Batalha Tech - Comparador de Elite</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
@@ -11,23 +11,28 @@
         .aurora-bg { position: fixed; inset: 0; z-index: -1; }
         .glow { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.15; }
         .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .slot-confirmed { border-color: #10b981 !important; background: rgba(16, 185, 129, 0.1) !important; box-shadow: 0 0 20px rgba(16, 185, 129, 0.2); }
-        ::-webkit-scrollbar { width: 6px; }
+        
+        /* Estilo da Tabela Profissional */
+        .table-container { border-radius: 2rem; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.1); }
+        .spec-label { position: sticky; left: 0; background: #011a14; z-index: 10; min-width: 140px; font-weight: 800; color: #10b981; font-size: 10px; text-transform: uppercase; }
+        .device-col { min-width: 200px; text-align: center; border-left: 1px solid rgba(255, 255, 255, 0.05); }
+        
+        ::-webkit-scrollbar { height: 6px; width: 6px; }
         ::-webkit-scrollbar-thumb { background: #10b981; border-radius: 10px; }
-        .tag-rumor { background: #f59e0b; color: black; font-size: 8px; padding: 2px 5px; border-radius: 4px; font-weight: 900; }
-        .result-item:hover { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+        .loading-spin { border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid #10b981; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="p-4 md:p-10">
 
     <div class="aurora-bg">
-        <div class="glow bg-emerald-500 w-[500px] h-[500px] -top-20 -left-20"></div>
-        <div class="glow bg-teal-500 w-[400px] h-[400px] bottom-0 right-0"></div>
+        <div class="glow bg-emerald-500 w-[600px] h-[600px] -top-20 -left-20"></div>
+        <div class="glow bg-teal-500 w-[500px] h-[500px] bottom-0 right-0"></div>
     </div>
 
-    <header class="max-w-7xl mx-auto text-center mb-10">
+    <header class="max-w-7xl mx-auto text-center mb-12">
         <h1 class="text-5xl md:text-7xl font-extrabold bg-gradient-to-r from-emerald-400 to-teal-200 bg-clip-text text-transparent italic tracking-tighter uppercase">BATALHA TECH</h1>
-        <p class="text-emerald-500/60 text-[10px] font-bold tracking-[0.4em] uppercase mt-2">O Comparador n.º 1 do Brasil • Rumores S25 e S26</p>
+        <p id="statusInfo" class="text-emerald-500/60 text-[10px] font-bold tracking-[0.4em] uppercase mt-2">Carregando banco de dados Apify...</p>
     </header>
 
     <main class="max-w-7xl mx-auto">
@@ -37,12 +42,12 @@
                 <script>
                     for(let i=0; i<4; i++) {
                         document.write(`
-                            <div class="slot glass p-6 rounded-[2.5rem] flex flex-col items-center gap-4 border-white/5 transition-all relative" id="slot-${i}">
-                                <span class="text-[9px] font-black text-emerald-500/40 uppercase tracking-widest">Aparelho 0${i+1}</span>
-                                <input type="text" placeholder="Busque S24, iPhone, S25..." 
-                                       oninput="buscarNoBanco(${i}, this.value)"
+                            <div class="slot glass p-6 rounded-[2.5rem] flex flex-col items-center gap-4 transition-all relative" id="slot-${i}">
+                                <span class="text-[9px] font-black text-emerald-500/40 uppercase tracking-widest uppercase">Slot ${i+1}</span>
+                                <input type="text" placeholder="Buscar celular..." 
+                                       oninput="filtrarAparelhos(${i}, this.value)"
                                        class="w-full bg-white/5 border border-white/10 rounded-full px-5 py-3 text-[11px] outline-none focus:border-emerald-500 transition-all uppercase">
-                                <div id="result-${i}" class="w-full space-y-1 mt-2 max-h-48 overflow-y-auto rounded-xl"></div>
+                                <div id="result-${i}" class="w-full space-y-1 mt-2 max-h-48 overflow-y-auto"></div>
                             </div>
                         `);
                     }
@@ -50,119 +55,131 @@
             </div>
 
             <div class="flex justify-center mb-16">
-                <button onclick="iniciarBatalha()" id="battleBtn" disabled class="bg-emerald-500 disabled:bg-white/5 disabled:text-white/20 text-black font-black px-16 py-5 rounded-full text-sm tracking-widest hover:scale-105 transition-all shadow-[0_0_30px_rgba(16,185,129,0.3)] uppercase">
-                    Batalhar Agora
+                <button onclick="iniciarDuelo()" id="battleBtn" disabled class="bg-emerald-500 disabled:bg-white/5 disabled:text-white/20 text-black font-black px-16 py-5 rounded-full text-sm tracking-widest hover:scale-105 transition-all shadow-[0_0_30px_rgba(16,185,129,0.3)] uppercase">
+                    Iniciar Batalha
                 </button>
             </div>
         </div>
 
-        <!-- RESULTADO -->
+        <!-- AREA DA TABELA (RESULTADO) -->
         <div id="battleArea" class="hidden opacity-0 translate-y-10 transition-all duration-700">
-            <div class="glass rounded-[3rem] overflow-hidden shadow-2xl">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left min-w-[800px]">
-                        <thead id="tableHead" class="border-b border-white/10 bg-emerald-500/5 text-sm uppercase"></thead>
-                        <tbody id="tableBody" class="text-xs md:text-sm"></tbody>
-                    </table>
-                </div>
+            <div class="table-container glass shadow-2xl overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead id="tableHead"></thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
             </div>
             <div class="text-center mt-12 pb-20">
-                <button onclick="location.reload()" class="bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 px-10 py-4 rounded-full text-xs font-bold uppercase hover:bg-emerald-500 hover:text-black transition-all">Nova Batalha</button>
+                <button onclick="location.reload()" class="bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 px-10 py-4 rounded-full text-xs font-bold uppercase hover:bg-emerald-500 hover:text-black transition-all">Nova Comparação</button>
             </div>
         </div>
     </main>
 
     <script>
-        // NOSSO BANCO DE DADOS LOCAL (FÁCIL DE EDITAR)
-        const db = [
-            // SAMSUNG
-            { name: "Galaxy S24 Ultra", price: "R$ 6.900", cpu: "Snapdragon 8 Gen 3", ram: "12GB", cam: "200MP + 50MP + 12MP", bat: "5000 mAh", screen: "6.8\" Dynamic AMOLED", img: "https://images.samsung.com/is/image/samsung/p6pim/br/2401/gallery/br-galaxy-s24-s928-sm-s928bztqzto-539358253" },
-            { name: "Galaxy S24 FE", price: "R$ 3.800", cpu: "Exynos 2400e", ram: "8GB", cam: "50MP + 12MP + 8MP", bat: "4700 mAh", screen: "6.7\" AMOLED", img: "https://images.samsung.com/is/image/samsung/p6pim/br/feature/165126830/br-feature-galaxy-s24-fe-s921-544186591" },
-            { name: "Galaxy S23 FE", price: "R$ 2.600", cpu: "Exynos 2200", ram: "8GB", cam: "50MP + 12MP + 8MP", bat: "4500 mAh", screen: "6.4\" AMOLED", img: "https://images.samsung.com/is/image/samsung/p6pim/br/2310/gallery/br-galaxy-s23-fe-s711-sm-s711bzkpzto-538356910" },
-            { name: "Galaxy A55", price: "R$ 1.900", cpu: "Exynos 1480", ram: "8GB", cam: "50MP + 12MP + 5MP", bat: "5000 mAh", screen: "6.6\" Super AMOLED", img: "https://images.samsung.com/is/image/samsung/p6pim/br/2403/gallery/br-galaxy-a55-5g-sm-a556-sm-a556ezkrzto-540192305" },
-            
-            // RUMORES SAMSUNG
-            { name: "Galaxy S25 Ultra", rumor: true, price: "Lançamento 2025", cpu: "Snapdragon 8 Gen 4", ram: "16GB", cam: "200MP (Novo Sensor)", bat: "5500 mAh", screen: "6.9\" AMOLED 144Hz", img: "https://cdn.dooca.store/107/products/s24-ultra-titanium-gray-01_1000x1000+fill_ffffff.png" },
-            { name: "Galaxy S25 FE", rumor: true, price: "Lançamento 2025", cpu: "Exynos 2500 / Snap 8s Gen 3", ram: "8GB", cam: "50MP Triple", bat: "4800 mAh", screen: "6.7\" AMOLED", img: "" },
-            { name: "Galaxy S26 Ultra", rumor: true, price: "Lançamento 2026", cpu: "Snapdragon 8 Gen 5", ram: "24GB", cam: "300MP Laser Focus", bat: "6000 mAh", screen: "7.0\" Ultra Tech", img: "" },
-
-            // APPLE
-            { name: "iPhone 16 Pro Max", price: "R$ 9.800", cpu: "Apple A18 Pro", ram: "8GB", cam: "48MP + 48MP + 12MP", bat: "4676 mAh", screen: "6.9\" Super Retina XDR", img: "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-9inch-naturaltitanium?wid=5120&hei=2880&fmt=p-jpg" },
-            { name: "iPhone 16", price: "R$ 6.500", cpu: "Apple A18", ram: "8GB", cam: "48MP + 12MP", bat: "3561 mAh", screen: "6.1\" OLED", img: "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-finish-select-202409-6-1inch-ultramarine?wid=5120&hei=2880&fmt=p-jpg" },
-            { name: "iPhone 15 Pro Max", price: "R$ 7.500", cpu: "Apple A17 Pro", ram: "8GB", cam: "48MP + 12MP + 12MP", bat: "4441 mAh", screen: "6.7\" Super Retina", img: "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-15-pro-finish-select-202309-6-7inch-naturaltitanium?wid=5120&hei=2880&fmt=p-jpg" },
-            { name: "iPhone 13", price: "R$ 3.400", cpu: "Apple A15 Bionic", ram: "4GB", cam: "12MP + 12MP", bat: "3240 mAh", screen: "6.1\" OLED", img: "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-13-finish-select-202207-blue?wid=5120&hei=2880&fmt=p-jpg" },
-
-            // XIAOMI / OUTROS
-            { name: "Xiaomi 14 Ultra", price: "R$ 6.200", cpu: "Snapdragon 8 Gen 3", ram: "16GB", cam: "50MP Leica Quad", bat: "5000 mAh", screen: "6.73\" LTPO AMOLED", img: "" },
-            { name: "Redmi Note 13 Pro", price: "R$ 1.800", cpu: "Helio G99 Ultra", ram: "8GB", cam: "200MP + 8MP + 2MP", bat: "5000 mAh", screen: "6.67\" AMOLED 120Hz", img: "" },
-            { name: "Poco X6 Pro", price: "R$ 2.400", cpu: "Dimensity 8300 Ultra", ram: "12GB", cam: "64MP + 8MP + 2MP", bat: "5000 mAh", screen: "6.67\" OLED 1.5K", img: "" }
-        ];
-
+        // LINK DO SEU DATASET DO APIFY
+        const DATASET_URL = 'https://api.apify.com/v2/datasets/2GJiVu6yOOFt35478/items?token=apify_api_bs5O1ysnZJsu4tUmr8UvSMej3I4cmU3qB7yL';
+        
+        let database = [];
         const selecionados = [null, null, null, null];
 
-        function buscarNoBanco(index, query) {
-            const resDiv = document.getElementById(`result-${index}`);
-            if (query.length < 1) { resDiv.innerHTML = ''; return; }
+        // Carregar dados na abertura do site
+        window.onload = async () => {
+            try {
+                const response = await fetch(DATASET_URL);
+                database = await response.json();
+                document.getElementById('statusInfo').innerText = `${database.length} APARELHOS SINCRONIZADOS COM APIFY`;
+            } catch (e) {
+                document.getElementById('statusInfo').innerText = "ERRO AO SINCRONIZAR. VERIFIQUE SEU TOKEN.";
+            }
+        };
 
-            const filtrados = db.filter(d => d.name.toLowerCase().includes(query.toLowerCase()));
-            
+        function filtrarAparelhos(index, query) {
+            const resDiv = document.getElementById(`result-${index}`);
+            if (query.length < 2) { resDiv.innerHTML = ''; return; }
+
+            const busca = query.toLowerCase();
+            const filtrados = database.filter(d => 
+                (d.phone_model || d.name || "").toLowerCase().includes(busca) || 
+                (d.brand_name || d.brand || "").toLowerCase().includes(busca)
+            );
+
             resDiv.innerHTML = '';
-            filtrados.forEach(item => {
+            filtrados.slice(0, 10).forEach(item => {
+                const name = item.phone_model || item.name || "Desconhecido";
                 const btn = document.createElement('button');
-                btn.className = "w-full text-left p-3 rounded-xl bg-white/5 text-[10px] font-semibold transition-all border border-white/5 mb-1 flex justify-between items-center uppercase result-item";
-                btn.innerHTML = `<span>${item.name}</span> ${item.rumor ? '<span class="tag-rumor">RUMOR</span>' : ''}`;
-                btn.onclick = () => fixarNoSlot(index, item);
+                btn.className = "w-full text-left p-3 rounded-xl bg-white/5 text-[10px] font-semibold hover:bg-emerald-500 hover:text-black transition-all border border-white/5 mb-1 uppercase";
+                btn.innerText = name;
+                btn.onclick = () => fixarSlot(index, item);
                 resDiv.appendChild(btn);
             });
         }
 
-        function fixarNoSlot(index, item) {
+        function fixarSlot(index, item) {
             const slotEl = document.getElementById(`slot-${index}`);
             selecionados[index] = item;
             
+            const name = item.phone_model || item.name;
+            const img = item.image_url || item.thumbnail || "";
+
             slotEl.classList.add('slot-confirmed');
             slotEl.innerHTML = `
-                <div class="h-24 flex items-center justify-center mb-2">
-                    ${item.img ? `<img src="${item.img}" class="h-full object-contain drop-shadow-2xl animate-bounce">` : `<div class="text-3xl">📱</div>`}
+                <div class="h-28 flex items-center justify-center mb-2">
+                    ${img ? `<img src="${img}" class="h-full object-contain drop-shadow-2xl">` : `<div class="text-4xl">📱</div>`}
                 </div>
-                <p class="text-[11px] font-bold text-center uppercase italic">${item.name}</p>
-                <button onclick="location.reload()" class="mt-4 text-[8px] font-bold text-red-400 uppercase tracking-widest">Trocar</button>
+                <p class="text-[10px] font-bold text-center uppercase italic leading-tight">${name}</p>
+                <button onclick="location.reload()" class="mt-4 text-[8px] font-bold text-red-500 uppercase tracking-widest">Remover</button>
             `;
             
             const count = selecionados.filter(s => s !== null).length;
             document.getElementById('battleBtn').disabled = count < 2;
         }
 
-        function iniciarBatalha() {
-            const ativos = selecionados.filter(s => s !== null);
+        function iniciarDuelo() {
             document.getElementById('setupArea').classList.add('hidden');
             const area = document.getElementById('battleArea');
             area.classList.remove('hidden');
             setTimeout(() => { area.style.opacity = "1"; area.style.transform = "translateY(0)"; }, 100);
 
+            const ativos = selecionados.filter(s => s !== null);
             const head = document.getElementById('tableHead');
             const body = document.getElementById('tableBody');
 
+            // CABEÇALHO (Imagens e Nomes)
             head.innerHTML = `
-                <tr>
-                    <th class="p-6 text-emerald-400 text-[10px] font-black italic tracking-widest uppercase">Atributo</th>
-                    ${ativos.map(p => `<th class="p-6 text-center border-l border-white/5 font-black text-sm uppercase">${p.name}</th>`).join('')}
+                <tr class="bg-emerald-500/10">
+                    <th class="p-6 spec-label border-b border-white/10">Especificação</th>
+                    ${ativos.map(p => `
+                        <th class="p-6 device-col border-b border-white/10">
+                            <img src="${p.image_url || p.thumbnail || ''}" class="h-20 mx-auto mb-2 object-contain">
+                            <span class="block font-black text-sm uppercase leading-none text-emerald-400">${p.phone_model || p.name}</span>
+                        </th>
+                    `).join('')}
                 </tr>
             `;
 
-            const rows = [
-                { label: 'Preço Médio', key: 'price' },
+            // MAPEAMENTO DE DADOS DO APIFY (Extrai as chaves comuns)
+            const specs = [
                 { label: 'Processador', key: 'cpu' },
+                { label: 'Chipset', key: 'chipset' },
                 { label: 'Memória RAM', key: 'ram' },
-                { label: 'Câmeras', key: 'cam' },
-                { label: 'Bateria', key: 'bat' },
-                { label: 'Tela', key: 'screen' }
+                { label: 'Bateria', key: 'battery' },
+                { label: 'Câmera Principal', key: 'camera_main' },
+                { label: 'Câmera Frontal', key: 'camera_selfie' },
+                { label: 'Display (Tela)', key: 'display_size' },
+                { label: 'Resolução', key: 'display_resolution' },
+                { label: 'Sistema (OS)', key: 'os' },
+                { label: 'Dimensões', key: 'dimensions' },
+                { label: 'Ano Lançamento', key: 'release_date' }
             ];
 
-            body.innerHTML = rows.map((row, i) => `
-                <tr class="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
-                    <td class="p-5 text-emerald-400 font-bold text-[10px] uppercase bg-emerald-500/5">${row.label}</td>
-                    ${ativos.map(p => `<td class="p-5 text-center border-l border-white/5 font-light text-[11px] text-white/90">${p[row.key]}</td>`).join('')}
+            body.innerHTML = specs.map((s, i) => `
+                <tr class="border-b border-white/5 hover:bg-white/[0.02]">
+                    <td class="p-4 spec-label border-r border-white/5">${s.label}</td>
+                    ${ativos.map(p => `
+                        <td class="p-4 device-col text-[11px] font-medium text-white/80">
+                            ${p[s.key] || p.specifications?.find(cat => cat.title === s.label)?.specs?.[0]?.val?.[0] || 'N/D'}
+                        </td>
+                    `).join('')}
                 </tr>
             `).join('');
         }
